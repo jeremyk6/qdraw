@@ -1,0 +1,21 @@
+[general]
+name=Qdraw
+qgisMinimumVersion=2.10
+description=Plugin that makes drawing easier
+version=1.0
+author=Jérémy Kalsron
+email=jeremy.kalsron@gmail.com
+
+about=Plugin that makes drawing easier.
+
+tracker=https://github.com/jeremyk6/qdraw/issues
+repository=https://github.com/jeremyk6/qdraw
+
+tags=drawing, buffer
+
+category=Plugins
+icon=icon.PNG
+
+experimental=True
+deprecated=False
+
