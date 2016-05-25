@@ -8,6 +8,7 @@ email=jeremy.kalsron@gmail.com
 
 about=Plugin that makes drawing easier.
 
+homepage=https://github.com/jeremyk6/qdraw/
 tracker=https://github.com/jeremyk6/qdraw/issues
 repository=https://github.com/jeremyk6/qdraw
 
