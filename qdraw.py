@@ -59,7 +59,7 @@ class Qdraw:
         
     def unload(self):
         for action in self.actions:
-            self.iface.removePluginMenu('&Qdraw', action)
+            self.iface.removePluginVectorMenu('&Qdraw', action)
             self.iface.removeToolBarIcon(action)
         del self.toolbar
         
@@ -95,7 +95,7 @@ class Qdraw:
             self.toolbar.addAction(action)
 
         if add_to_menu:
-            self.iface.addPluginToMenu(
+            self.iface.addPluginToVectorMenu(
                 self.menu,
                 action)
 
