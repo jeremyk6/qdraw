@@ -33,8 +33,6 @@ class drawRect(QgsMapTool):
       self.iface = iface
       self.rb=QgsRubberBand(self.canvas,QGis.Polygon)
       self.rb.setColor( couleur )
-      sb = self.iface.mainWindow().statusBar()
-      sb.showMessage(u"Dessiner un rectangle")
       self.reset()
       return None
 
@@ -93,8 +91,6 @@ class drawPolygon(QgsMapTool):
       self.status = 0
       self.rb=QgsRubberBand(self.canvas,QGis.Polygon)
       self.rb.setColor( couleur )
-      sb = self.iface.mainWindow().statusBar()
-      sb.showMessage(u"Clic gauche pour poser des points, clic droit pour terminer la saisie")
       return None
 
   def canvasPressEvent(self,e):
@@ -135,8 +131,6 @@ class drawCircle(QgsMapTool):
       self.segments = segments
       self.rb=QgsRubberBand(self.canvas, QGis.Polygon)
       self.rb.setColor( color )
-      sb = self.iface.mainWindow().statusBar()
-      sb.showMessage(u"Placer le centre et déplacer le curseur de la souris pour fixer le rayon")
       return None
 
   def canvasPressEvent(self,e):
@@ -153,9 +147,6 @@ class drawCircle(QgsMapTool):
       # construct a circle with N segments
       cp = self.toMapCoordinates(e.pos())
       rbcircle(self.rb, self.center, cp, self.segments)
-      r = sqrt(self.center.sqrDist(cp))
-      sb = self.iface.mainWindow().statusBar()
-      sb.showMessage(u"Centre: X=%s Y=%s, RAYON: %s m" % (str(self.center.x()),str(self.center.y()),str(r)))
       self.rb.show()
 
   def canvasReleaseEvent(self,e):
@@ -166,7 +157,7 @@ class drawCircle(QgsMapTool):
       if self.rb.numberOfVertices() > 3:
         self.emit( SIGNAL("selectionDone()") )
       else:
-        radius, ok = QInputDialog.getInt(self.iface.mainWindow(), 'Rayon', u'Entrez un rayon en m:', min=0)
+        radius, ok = QInputDialog.getInt(self.iface.mainWindow(), tr('Radius'), tr('Give a radius in m:'), min=0)
         cp = self.toMapCoordinates(e.pos())
         cp.setX(cp.x()+radius)
         rbcircle(self.rb, self.toMapCoordinates(e.pos()), cp, self.segments)
@@ -199,8 +190,6 @@ class drawLine(QgsMapTool):
       self.status = 0
       self.rb=QgsRubberBand(self.canvas,QGis.Line)
       self.rb.setColor( couleur )
-      sb = self.iface.mainWindow().statusBar()
-      sb.showMessage(u"Clic gauche pour poser des points, clic droit pour terminer la saisie")
       return None
 
   def canvasPressEvent(self,e):
@@ -239,8 +228,6 @@ class drawPoint(QgsMapTool):
       self.rb=QgsRubberBand(self.canvas,QGis.Point)
       self.rb.setColor( couleur )
       self.rb.setWidth(3)
-      sb = self.iface.mainWindow().statusBar()
-      sb.showMessage(u"Clic gauche pour poser un point")
       return None
 
   def canvasReleaseEvent(self,e):
@@ -263,8 +250,6 @@ class selectPoint(QgsMapTool):
       self.iface = iface
       self.rb=QgsRubberBand(self.canvas,QGis.Polygon)
       self.rb.setColor( couleur )
-      sb = self.iface.mainWindow().statusBar()
-      sb.showMessage(u"clic gauche pour poser un point")
       return None
 
   def canvasReleaseEvent(self,e):
@@ -297,8 +282,6 @@ class copyFeatures(QgsMapTool):
       self.rb.setWidth(3)
       self.color = color
       self.rb.setColor( color )
-      sb = self.iface.mainWindow().statusBar()
-      sb.showMessage(u"Cliquer sur les éléments à copier")
       
       self.geom = []
       
@@ -319,3 +302,6 @@ class copyFeatures(QgsMapTool):
   def deactivate(self):
     self.rb.reset( QGis.Point )
     return
+
+def tr(message):
+    return QCoreApplication.translate('Qdraw', message)

@@ -19,14 +19,14 @@
 
 from PyQt4 import QtGui, QtCore
 from PyQt4.QtGui import QPushButton, QSlider, QDesktopWidget, QLabel, QColorDialog, QColor
-from PyQt4.QtCore import Qt, SIGNAL
+from PyQt4.QtCore import Qt, SIGNAL, QCoreApplication
 
 # window used to change settings (transparency/color)
 class QdrawSettings(QtGui.QWidget):
     def __init__(self):
         QtGui.QWidget.__init__(self)
         
-        self.setWindowTitle(u'Qdraw - Paramètres')
+        self.setWindowTitle(self.tr('Qdraw - Settings'))
         self.setFixedSize(320,100)
         self.center()
         
@@ -38,10 +38,10 @@ class QdrawSettings(QtGui.QWidget):
         self.sld_opacity.setValue(255)
         self.sld_opacity.tracking = True
         self.sld_opacity.valueChanged.connect(self.handler_opacitySliderValue)    
-        self.lbl_opacity = QLabel(u'Opacité: 100%', self)
+        self.lbl_opacity = QLabel(self.tr('Opacity')+ ': 100%', self)
         
         self.dlg_color = QColorDialog(self)
-        btn_chColor = QPushButton("Changer la couleur de dessin", self)
+        btn_chColor = QPushButton(self.tr('Change the drawing color'), self)
         btn_chColor.clicked.connect(self.handler_chColor)
            
         vbox = QtGui.QVBoxLayout()
@@ -49,10 +49,13 @@ class QdrawSettings(QtGui.QWidget):
         vbox.addWidget(self.sld_opacity)
         vbox.addWidget(btn_chColor)
         self.setLayout(vbox)
+        
+    def tr(self, message):
+        return QCoreApplication.translate('Qdraw', message)
     
     def handler_opacitySliderValue(self, val):   
         self.color.setAlpha(val)
-        self.lbl_opacity.setText(u'Opacité: '+str(int((float(val)/255)*100))+'%')
+        self.lbl_opacity.setText(self.tr('Opacity')+': '+str(int((float(val)/255)*100))+'%')
         self.emit( SIGNAL("settingsChanged()"))
             
     def handler_chColor(self):

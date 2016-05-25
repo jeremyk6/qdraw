@@ -17,7 +17,7 @@
 #You should have received a copy of the GNU General Public License
 #along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4.QtCore import SIGNAL
+from PyQt4.QtCore import SIGNAL, QTranslator
 from PyQt4.QtGui import QAction, QIcon
 
 from qgis.core import *
@@ -25,12 +25,28 @@ from qgis.core import *
 from drawtools import *
 from qdrawsettings import *
 
+import os
 import resources
 
 class Qdraw:
 
     def __init__(self, iface):
+        locale = QSettings().value('locale/userLocale')[0:2]
+        locale_path = os.path.join(
+            os.path.dirname(__file__),
+            'i18n',
+            'qdraw_{}.qm'.format(locale))
+        
+        self.translator = None
+        if os.path.exists(locale_path):
+            self.translator = QTranslator()
+            self.translator.load(locale_path)
+
+            if qVersion() > '4.3.3':
+                QCoreApplication.installTranslator(self.translator)
+    
         self.iface = iface
+        self.sb = self.iface.mainWindow().statusBar()
         self.tool = None
         self.toolname = None
 
@@ -46,6 +62,9 @@ class Qdraw:
             self.iface.removePluginMenu('&Qdraw', action)
             self.iface.removeToolBarIcon(action)
         del self.toolbar
+        
+    def tr(self, message):
+        return QCoreApplication.translate('Qdraw', message)
 
     def add_action(
         self,
@@ -88,56 +107,56 @@ class Qdraw:
         icon_path = ':/plugins/Qgeric/resources/icon_DrawPt.png'
         self.add_action(
             icon_path,
-            text='Dessiner un point',
+            text=self.tr('Point drawing tool'),
             callback=self.drawPoint,
             parent=self.iface.mainWindow()
         ) 
         icon_path = ':/plugins/Qgeric/resources/icon_DrawL.png'
         self.add_action(
             icon_path,
-            text='Dessiner une ligne',
+            text=self.tr('Line drawing tool'),
             callback=self.drawLine,
             parent=self.iface.mainWindow()
         ) 
         icon_path = ':/plugins/Qgeric/resources/icon_DrawR.png'
         self.add_action(
             icon_path,
-            text='Dessiner un rectangle',
+            text=self.tr('Rectangle drawing tool'),
             callback=self.drawRect,
             parent=self.iface.mainWindow()
         ) 
         icon_path = ':/plugins/Qgeric/resources/icon_DrawC.png'
         self.add_action(
             icon_path,
-            text='Dessiner un cercle',
+            text=self.tr('Circle drawing tool'),
             callback=self.drawCircle,
             parent=self.iface.mainWindow()
         ) 
         icon_path = ':/plugins/Qgeric/resources/icon_DrawP.png'
         self.add_action(
             icon_path,
-            text='Dessiner un polygone',
+            text=self.tr('Polygon drawing tool'),
             callback=self.drawPolygon,
             parent=self.iface.mainWindow()
         ) 
         icon_path = ':/plugins/Qgeric/resources/icon_DrawT.png'
         self.add_action(
             icon_path,
-            text='Dessiner un tampon',
+            text=self.tr('Buffer drawing tool'),
             callback=self.drawBuffer,
             parent=self.iface.mainWindow()
         ) 
         icon_path = ':/plugins/Qgeric/resources/icon_DrawCp.png'
         self.add_action(
             icon_path,
-            text=u'Copier des éléments',
+            text=self.tr('Attributes copying tool'),
             callback=self.copyFeatures,
             parent=self.iface.mainWindow()
         ) 
         icon_path = ':/plugins/Qgeric/resources/icon_Settings.png'
         self.add_action(
             icon_path,
-            text=u'Réglages',
+            text=self.tr('Settings'),
             callback=self.showSettingsWindow,
             parent=self.iface.mainWindow()
         )      
@@ -150,6 +169,7 @@ class Qdraw:
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'point'
         self.toolname = 'drawPoint'
+        self.sb.showMessage(self.tr('Left click to place a point.'))
         
     def drawLine(self):
         if self.tool:
@@ -159,6 +179,7 @@ class Qdraw:
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'line'
         self.toolname = 'drawLine'
+        self.sb.showMessage(self.tr('Left click to place points. Right click to confirm.'))
         
     def drawRect(self):
         if self.tool:
@@ -168,6 +189,7 @@ class Qdraw:
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'polygon'
         self.toolname = 'drawRect'
+        self.sb.showMessage(self.tr('Maintain the left click to draw a rectangle.'))
         
     def drawCircle(self):
         if self.tool:
@@ -177,6 +199,7 @@ class Qdraw:
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'polygon'
         self.toolname = 'drawCircle'
+        self.sb.showMessage(self.tr('Maintain the left click to draw a circle. Simple Left click to give a perimeter.'))
         
     def drawPolygon(self):
         if self.tool:
@@ -186,6 +209,7 @@ class Qdraw:
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'polygon'
         self.toolname = 'drawPolygon'
+        self.sb.showMessage(self.tr('Left click to place points. Right click to confirm.'))
         
     def drawBuffer(self):
         if self.tool:
@@ -195,6 +219,7 @@ class Qdraw:
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'polygon'
         self.toolname = 'drawBuffer'
+        self.sb.showMessage(self.tr('Select a vector layer in the Layer Tree, then left click on an attribute of this layer on the map.'))
         
     def copyFeatures(self):
         if self.tool:
@@ -204,6 +229,7 @@ class Qdraw:
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'polygon'
         self.toolname = 'drawCopies'
+        self.sb.showMessage(self.tr('Select a vector layer in the Layer Tree, then left click on attributes of this layer on the map. Right Click to confirm.'))
         
     def showSettingsWindow(self):
         self.iface.connect(self.settings, SIGNAL("settingsChanged()"), self.settingsChanged)
@@ -269,7 +295,7 @@ class Qdraw:
                     rb.setToGeometry(union_geoms, layer)
                     perim = 0
                     if self.toolname == 'drawBuffer':
-                        perim, ok = QInputDialog.getInt(self.iface.mainWindow(), u'Périmètre', u'Entrez un périmètre en m:', min=0)  
+                        perim, ok = QInputDialog.getInt(self.iface.mainWindow(), self.tr('Perimeter'), self.tr('Give a perimeter in m:'), min=0)  
                     buffer_geom_crs = QgsCoordinateReferenceSystem(2154) # use a CRS that supports metric system
                     g = self.geomTransform(union_geoms, layer.crs(), buffer_geom_crs).buffer(perim, 40) 
                     rb.setToGeometry(g, QgsVectorLayer("Polygon?crs=epsg:2154","","memory"))
@@ -285,15 +311,15 @@ class Qdraw:
             g = self.geomTransform(rb.asGeometry(), self.iface.mapCanvas().mapRenderer().destinationCrs(), QgsCoordinateReferenceSystem(2154))
             
         if ok and warning == False:
-            name, ok = QInputDialog.getText(self.iface.mainWindow(), u'Dessin', u'Entrez le nom de la nouvelle couche:')
+            name, ok = QInputDialog.getText(self.iface.mainWindow(), self.tr('Drawing'), self.tr('Give a name to the layer:'))
         if ok and warning == False:
             layer = None
             if self.drawShape == 'point':
-                layer = QgsVectorLayer("Point?crs=epsg:2154&field=Dessin:string(255)",name,"memory")
+                layer = QgsVectorLayer("Point?crs=epsg:2154&field="+self.tr('Drawings')+":string(255)",name,"memory")
             elif self.drawShape == 'line':
-                layer = QgsVectorLayer("LineString?crs=epsg:2154&field=Dessin:string(255)",name,"memory")
+                layer = QgsVectorLayer("LineString?crs=epsg:2154&field="+self.tr('Drawings')+":string(255)",name,"memory")
             else:
-                layer = QgsVectorLayer("Polygon?crs=epsg:2154&field=Dessin:string(255)",name,"memory")
+                layer = QgsVectorLayer("Polygon?crs=epsg:2154&field="+self.tr('Drawings')+":string(255)",name,"memory")
             layer.startEditing()
             symbols = layer.rendererV2().symbols()
             symbols[0].setColor(self.settings.getColor())
@@ -303,17 +329,17 @@ class Qdraw:
             layer.dataProvider().addFeatures([feature])
             layer.commitChanges()
             QgsMapLayerRegistry.instance().addMapLayer(layer, False)
-            if QgsProject.instance().layerTreeRoot().findGroup(u'Dessins') == None:
-                QgsProject.instance().layerTreeRoot().insertChildNode(0,QgsLayerTreeGroup('Dessins'))
-            group = QgsProject.instance().layerTreeRoot().findGroup(u'Dessins')
+            if QgsProject.instance().layerTreeRoot().findGroup(self.tr('Drawings')) == None:
+                QgsProject.instance().layerTreeRoot().insertChildNode(0,QgsLayerTreeGroup(self.tr('Drawings')))
+            group = QgsProject.instance().layerTreeRoot().findGroup(self.tr('Drawings'))
             group.insertLayer(0,layer)
             self.iface.mapCanvas().refresh()
         else:
             if warning:
                 if errBuffer_noAtt:
-                    self.iface.messageBar().pushMessage("Attention", u"Vous n'avez pas cliqué sur un attribut de la couche !", level=QgsMessageBar.WARNING, duration=3)
+                    self.iface.messageBar().pushMessage(self.tr('Warning'), self.tr('You didn\'t click on a layer\'s attribute !'), level=QgsMessageBar.WARNING, duration=3)
                 elif errBuffer_Vertices:
-                    self.iface.messageBar().pushMessage("Attention", u"Vous devez préciser un périmètre non-nul pour un point ou une ligne !", level=QgsMessageBar.WARNING, duration=3)
+                    self.iface.messageBar().pushMessage(self.tr('Warning'), self.tr('You must give a non-null value for a point\'s or line\'s perimeter !'), level=QgsMessageBar.WARNING, duration=3)
                 else:
-                    self.iface.messageBar().pushMessage("Attention", u"Aucune couche n'est sélectionnée, ou celle-ci n'est pas vectorielle ou n'est pas visible !", level=QgsMessageBar.WARNING, duration=3)
+                    self.iface.messageBar().pushMessage(self.tr('Warning'), self.tr('There is no selected layer, or it is not vector nor visible !'), level=QgsMessageBar.WARNING, duration=3)
         self.tool.reset()
