@@ -39,6 +39,10 @@
         <translation>Périmètre</translation>
     </message>
     <message>
+        <source>(works only with metric crs)</source>
+        <translation>(fonctionne uniquement avec un système métrique)</translation>
+    </message>
+    <message>
         <source>Give a perimeter in m:</source>
         <translation>Entrez un périmètre en m:</translation>
     </message>

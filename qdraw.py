@@ -295,11 +295,10 @@ class Qdraw:
                     rb.setToGeometry(union_geoms, layer)
                     perim = 0
                     if self.toolname == 'drawBuffer':
-                        perim, ok = QInputDialog.getInt(self.iface.mainWindow(), self.tr('Perimeter'), self.tr('Give a perimeter in m:'), min=0)  
-                    buffer_geom_crs = QgsCoordinateReferenceSystem(2154) # use a CRS that supports metric system
-                    g = self.geomTransform(union_geoms, layer.crs(), buffer_geom_crs).buffer(perim, 40) 
-                    rb.setToGeometry(g, QgsVectorLayer("Polygon?crs=epsg:2154","","memory"))
-                    if rb.numberOfVertices() <= 1 and ok:
+                        perim, ok = QInputDialog.getInt(self.iface.mainWindow(), self.tr('Perimeter'), self.tr('Give a perimeter in m:')+'\n'+self.tr('(works only with metric crs)'), min=0)                       
+                    g = union_geoms.buffer(perim, 40)
+                    rb.setToGeometry(g, QgsVectorLayer("Polygon?crs="+layer.crs().authid(),"","memory"))
+                    if g.length() == 0 and ok:
                         warning = True
                         errBuffer_Vertices = True
                 else:
@@ -307,19 +306,18 @@ class Qdraw:
                     errBuffer_noAtt = True
             else:
                 warning = True
-        else:        
-            g = self.geomTransform(rb.asGeometry(), self.iface.mapCanvas().mapRenderer().destinationCrs(), QgsCoordinateReferenceSystem(2154))
             
         if ok and warning == False:
             name, ok = QInputDialog.getText(self.iface.mainWindow(), self.tr('Drawing'), self.tr('Give a name to the layer:'))
         if ok and warning == False:
             layer = None
             if self.drawShape == 'point':
-                layer = QgsVectorLayer("Point?crs=epsg:2154&field="+self.tr('Drawings')+":string(255)",name,"memory")
+                layer = QgsVectorLayer("Point?crs="+self.iface.mapCanvas().mapRenderer().destinationCrs().authid()+"&field="+self.tr('Drawings')+":string(255)",name,"memory")
             elif self.drawShape == 'line':
-                layer = QgsVectorLayer("LineString?crs=epsg:2154&field="+self.tr('Drawings')+":string(255)",name,"memory")
+                layer = QgsVectorLayer("LineString?crs="+self.iface.mapCanvas().mapRenderer().destinationCrs().authid()+"&field="+self.tr('Drawings')+":string(255)",name,"memory")
+                print "LineString?crs="+self.iface.mapCanvas().mapRenderer().destinationCrs().authid()+"&field="+self.tr('Drawings')+":string(255)"
             else:
-                layer = QgsVectorLayer("Polygon?crs=epsg:2154&field="+self.tr('Drawings')+":string(255)",name,"memory")
+                layer = QgsVectorLayer("Polygon?crs="+self.iface.mapCanvas().mapRenderer().destinationCrs().authid()+"&field="+self.tr('Drawings')+":string(255)",name,"memory")
             layer.startEditing()
             symbols = layer.rendererV2().symbols()
             symbols[0].setColor(self.settings.getColor())
