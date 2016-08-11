@@ -80,6 +80,7 @@ class drawRect(QgsMapTool):
 
   def deactivate(self):
       self.rb.reset( True )
+      QgsMapTool.deactivate(self)
 
 class drawPolygon(QgsMapTool):
   '''Outil de sélection par polygone, tiré de selectPlusFr'''
@@ -119,6 +120,7 @@ class drawPolygon(QgsMapTool):
 
   def deactivate(self):
     self.rb.reset( True )
+    QgsMapTool.deactivate(self)
 
 class drawCircle(QgsMapTool):
   '''Outil de sélection par cercle, tiré de selectPlusFr'''
@@ -171,6 +173,7 @@ class drawCircle(QgsMapTool):
 
   def deactivate(self):
     self.rb.reset( True )
+    QgsMapTool.deactivate(self)
 
 def rbcircle(rb,center,edgePoint,N):
     '''Fonction qui affiche une rubberband sous forme de cercle'''
@@ -218,6 +221,7 @@ class drawLine(QgsMapTool):
 
   def deactivate(self):
     self.rb.reset( QGis.Line )
+    QgsMapTool.deactivate(self)
 
 class drawPoint(QgsMapTool):
   def __init__(self,iface, couleur):
@@ -241,6 +245,7 @@ class drawPoint(QgsMapTool):
 
   def deactivate(self):
     self.rb.reset( QGis.Point )
+    QgsMapTool.deactivate(self)
 
 class selectPoint(QgsMapTool):
   def __init__(self,iface, couleur):
@@ -272,6 +277,7 @@ class selectPoint(QgsMapTool):
 
   def deactivate(self):
     self.rb.reset( QGis.Polygon )
+    QgsMapTool.deactivate(self)
  
 class copyFeatures(QgsMapTool):
   def __init__(self,iface,color):
@@ -301,6 +307,7 @@ class copyFeatures(QgsMapTool):
     
   def deactivate(self):
     self.rb.reset( QGis.Point )
+    QgsMapTool.deactivate(self)
     return
 
 def tr(message):

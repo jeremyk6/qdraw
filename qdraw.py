@@ -108,6 +108,7 @@ class Qdraw:
         self.add_action(
             icon_path,
             text=self.tr('Point drawing tool'),
+            checkable=True,
             callback=self.drawPoint,
             parent=self.iface.mainWindow()
         ) 
@@ -115,6 +116,7 @@ class Qdraw:
         self.add_action(
             icon_path,
             text=self.tr('Line drawing tool'),
+            checkable=True,
             callback=self.drawLine,
             parent=self.iface.mainWindow()
         ) 
@@ -122,6 +124,7 @@ class Qdraw:
         self.add_action(
             icon_path,
             text=self.tr('Rectangle drawing tool'),
+            checkable=True,
             callback=self.drawRect,
             parent=self.iface.mainWindow()
         ) 
@@ -129,6 +132,7 @@ class Qdraw:
         self.add_action(
             icon_path,
             text=self.tr('Circle drawing tool'),
+            checkable=True,
             callback=self.drawCircle,
             parent=self.iface.mainWindow()
         ) 
@@ -136,6 +140,7 @@ class Qdraw:
         self.add_action(
             icon_path,
             text=self.tr('Polygon drawing tool'),
+            checkable=True,
             callback=self.drawPolygon,
             parent=self.iface.mainWindow()
         ) 
@@ -143,6 +148,7 @@ class Qdraw:
         self.add_action(
             icon_path,
             text=self.tr('Buffer drawing tool on the selected layer'),
+            checkable=True,
             callback=self.drawBuffer,
             parent=self.iface.mainWindow()
         ) 
@@ -150,6 +156,7 @@ class Qdraw:
         self.add_action(
             icon_path,
             text=self.tr('Attributes copying tool'),
+            checkable=True,
             callback=self.copyFeatures,
             parent=self.iface.mainWindow()
         ) 
@@ -165,6 +172,7 @@ class Qdraw:
         if self.tool:
             self.tool.reset()
         self.tool = drawPoint(self.iface, self.settings.getColor())
+        self.tool.setAction(self.actions[0])
         self.iface.connect(self.tool, SIGNAL("selectionDone()"), self.draw)
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'point'
@@ -175,6 +183,7 @@ class Qdraw:
         if self.tool:
             self.tool.reset()
         self.tool = drawLine(self.iface, self.settings.getColor())
+        self.tool.setAction(self.actions[1])
         self.iface.connect(self.tool, SIGNAL("selectionDone()"), self.draw)
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'line'
@@ -185,6 +194,7 @@ class Qdraw:
         if self.tool:
             self.tool.reset()
         self.tool = drawRect(self.iface, self.settings.getColor())
+        self.tool.setAction(self.actions[2])
         self.iface.connect(self.tool, SIGNAL("selectionDone()"), self.draw)
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'polygon'
@@ -195,6 +205,7 @@ class Qdraw:
         if self.tool:
             self.tool.reset()
         self.tool = drawCircle(self.iface, self.settings.getColor(), 40)
+        self.tool.setAction(self.actions[3])
         self.iface.connect(self.tool, SIGNAL("selectionDone()"), self.draw)
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'polygon'
@@ -205,6 +216,7 @@ class Qdraw:
         if self.tool:
             self.tool.reset()
         self.tool = drawPolygon(self.iface, self.settings.getColor())
+        self.tool.setAction(self.actions[4])
         self.iface.connect(self.tool, SIGNAL("selectionDone()"), self.draw)
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'polygon'
@@ -215,6 +227,7 @@ class Qdraw:
         if self.tool:
             self.tool.reset()
         self.tool = selectPoint(self.iface, self.settings.getColor())
+        self.tool.setAction(self.actions[5])
         self.iface.connect(self.tool, SIGNAL("selectionDone()"), self.draw)
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'polygon'
@@ -225,6 +238,7 @@ class Qdraw:
         if self.tool:
             self.tool.reset()
         self.tool = copyFeatures(self.iface, self.settings.getColor())
+        self.tool.setAction(self.actions[6])
         self.iface.connect(self.tool, SIGNAL("selectionDone()"), self.draw)
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'polygon'
