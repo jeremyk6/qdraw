@@ -23,8 +23,8 @@
         <translation>Outil de dessin de polygones</translation>
     </message>
     <message>
-        <source>Buffer drawing tool</source>
-        <translation>Outil de dessin de tampons</translation>
+        <source>Buffer drawing tool on the selected layer</source>
+        <translation>Outil de dessin de tampons sur la couche sélectionnée</translation>
     </message>
     <message>
         <source>Attributes copying tool</source>

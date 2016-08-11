@@ -142,7 +142,7 @@ class Qdraw:
         icon_path = ':/plugins/Qgeric/resources/icon_DrawT.png'
         self.add_action(
             icon_path,
-            text=self.tr('Buffer drawing tool'),
+            text=self.tr('Buffer drawing tool on the selected layer'),
             callback=self.drawBuffer,
             parent=self.iface.mainWindow()
         ) 
