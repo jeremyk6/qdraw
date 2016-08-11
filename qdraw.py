@@ -308,7 +308,10 @@ class Qdraw:
                 warning = True
             
         if ok and warning == False:
-            name, ok = QInputDialog.getText(self.iface.mainWindow(), self.tr('Drawing'), self.tr('Give a name to the layer:'))
+            name = ''
+            ok = True
+            while not name.strip() and ok == True:
+                name, ok = QInputDialog.getText(self.iface.mainWindow(), self.tr('Drawing'), self.tr('Give a name to the layer:'))
         if ok and warning == False:
             layer = None
             if self.drawShape == 'point':
