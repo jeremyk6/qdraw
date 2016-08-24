@@ -64,6 +64,7 @@ class QdrawSettings(QtGui.QWidget):
             color.setAlpha(self.color.alpha())
             self.color = color
             self.emit( SIGNAL("settingsChanged()"))
+            self.close()
         
     def getColor(self):
         return self.color
