@@ -111,6 +111,14 @@ class Qdraw:
             checkable=True,
             callback=self.drawPoint,
             parent=self.iface.mainWindow()
+        )
+        icon_path = ':/plugins/Qgeric/resources/icon_DrawPtXY.png'
+        self.add_action(
+            icon_path,
+            text=self.tr('XY Point drawing tool'),
+            checkable=False,
+            callback=self.drawXYPoint,
+            parent=self.iface.mainWindow()
         ) 
         icon_path = ':/plugins/Qgeric/resources/icon_DrawL.png'
         self.add_action(
@@ -179,11 +187,25 @@ class Qdraw:
         self.toolname = 'drawPoint'
         self.sb.showMessage(self.tr('Left click to place a point.'))
         
+    def drawXYPoint(self):
+        ok = False
+        x, ok = QInputDialog.getDouble(self.iface.mainWindow(), "X", self.tr("Input X:"), min = -180.0000, max = 180.0000, decimals = 6)
+        if ok:
+            y, ok = QInputDialog.getDouble(self.iface.mainWindow(), "Y", self.tr("Input Y:"), min = -90.0000, max = 90.0000, decimals = 6)
+            if ok:    
+                self.drawPoint()
+                self.tool.rb = QgsRubberBand(self.iface.mapCanvas(),QGis.Point)
+                self.tool.rb.setColor( self.settings.getColor() )
+                self.tool.rb.setWidth(3)
+                self.tool.rb.addPoint(QgsPoint(y, x))
+                self.drawShape = 'XYpoint'
+                self.draw()
+        
     def drawLine(self):
         if self.tool:
             self.tool.reset()
         self.tool = drawLine(self.iface, self.settings.getColor())
-        self.tool.setAction(self.actions[1])
+        self.tool.setAction(self.actions[2])
         self.iface.connect(self.tool, SIGNAL("selectionDone()"), self.draw)
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'line'
@@ -194,7 +216,7 @@ class Qdraw:
         if self.tool:
             self.tool.reset()
         self.tool = drawRect(self.iface, self.settings.getColor())
-        self.tool.setAction(self.actions[2])
+        self.tool.setAction(self.actions[3])
         self.iface.connect(self.tool, SIGNAL("selectionDone()"), self.draw)
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'polygon'
@@ -205,7 +227,7 @@ class Qdraw:
         if self.tool:
             self.tool.reset()
         self.tool = drawCircle(self.iface, self.settings.getColor(), 40)
-        self.tool.setAction(self.actions[3])
+        self.tool.setAction(self.actions[4])
         self.iface.connect(self.tool, SIGNAL("selectionDone()"), self.draw)
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'polygon'
@@ -216,7 +238,7 @@ class Qdraw:
         if self.tool:
             self.tool.reset()
         self.tool = drawPolygon(self.iface, self.settings.getColor())
-        self.tool.setAction(self.actions[4])
+        self.tool.setAction(self.actions[5])
         self.iface.connect(self.tool, SIGNAL("selectionDone()"), self.draw)
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'polygon'
@@ -227,7 +249,7 @@ class Qdraw:
         if self.tool:
             self.tool.reset()
         self.tool = selectPoint(self.iface, self.settings.getColor())
-        self.tool.setAction(self.actions[5])
+        self.tool.setAction(self.actions[6])
         self.iface.connect(self.tool, SIGNAL("selectionDone()"), self.draw)
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'polygon'
@@ -238,7 +260,7 @@ class Qdraw:
         if self.tool:
             self.tool.reset()
         self.tool = copyFeatures(self.iface, self.settings.getColor())
-        self.tool.setAction(self.actions[6])
+        self.tool.setAction(self.actions[7])
         self.iface.connect(self.tool, SIGNAL("selectionDone()"), self.draw)
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'polygon'
@@ -330,6 +352,8 @@ class Qdraw:
             layer = None
             if self.drawShape == 'point':
                 layer = QgsVectorLayer("Point?crs="+self.iface.mapCanvas().mapRenderer().destinationCrs().authid()+"&field="+self.tr('Drawings')+":string(255)",name,"memory")
+            elif self.drawShape == 'XYpoint':
+                layer = QgsVectorLayer("Point?crs=epsg:4326"+"&field="+self.tr('Drawings')+":string(255)",name,"memory")
             elif self.drawShape == 'line':
                 layer = QgsVectorLayer("LineString?crs="+self.iface.mapCanvas().mapRenderer().destinationCrs().authid()+"&field="+self.tr('Drawings')+":string(255)",name,"memory")
                 print "LineString?crs="+self.iface.mapCanvas().mapRenderer().destinationCrs().authid()+"&field="+self.tr('Drawings')+":string(255)"

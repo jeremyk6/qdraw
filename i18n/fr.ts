@@ -7,6 +7,18 @@
         <translation>Outil de dessin de points</translation>
     </message>
     <message>
+        <source>XY Point drawing tool</source>
+        <translation>Outil de dessin de point XY</translation>
+    </message>
+    <message>
+        <source>Input X:</source>
+        <translation>Entrez X:</translation>
+    </message>
+    <message>
+        <source>Input Y:</source>
+        <translation>Entrez Y:</translation>
+    </message>
+    <message>
         <source>Line drawing tool</source>
         <translation>Outil de dessin de lignes</translation>
     </message>
