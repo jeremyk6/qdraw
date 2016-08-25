@@ -285,14 +285,16 @@ class selectPoint(QgsMapTool):
     QgsMapTool.deactivate(self)
  
 class copyFeatures(QgsMapTool):
-  def __init__(self,iface,color):
+  def __init__(self,iface,color,layer):
       self.canvas = iface.mapCanvas()
       QgsMapTool.__init__(self, self.canvas)
       self.iface = iface
-      self.rb = QgsRubberBand(self.canvas, QGis.Point)
+      self.rb = QgsRubberBand(self.canvas, QGis.Polygon)
       self.rb.setWidth(3)
       self.color = color
       self.rb.setColor( color )
+      
+      self.layer = layer
       
       self.geom = []
       
@@ -301,17 +303,21 @@ class copyFeatures(QgsMapTool):
   def canvasReleaseEvent(self,e):
     if e.button() == Qt.LeftButton:
         point = self.toMapCoordinates(e.pos())
-        self.rb.addPoint(point)
-        self.rb.show()
+        geom = QgsGeometry()
+        geom.addPart([point], QGis.Point)
+        features = self.layer.getFeatures(QgsFeatureRequest(geom.boundingBox()))
+        for feature in features:
+            self.rb.addGeometry(feature.geometry(), self.layer)
+            self.rb.show()
     else:
         self.emit( SIGNAL("selectionDone()"))
 
   def reset(self):
-    self.rb.reset( QGis.Point )
+    self.rb.reset( QGis.Polygon )
     return
     
   def deactivate(self):
-    self.rb.reset( QGis.Point )
+    self.rb.reset( QGis.Polygon )
     QgsMapTool.deactivate(self)
     return
 

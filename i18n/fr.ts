@@ -47,6 +47,10 @@
         <translation>Outil de copie d'attributs</translation>
     </message>
     <message>
+        <source>No vector layer selected !</source>
+        <translation>Aucune couche vecteur sélectionnée !</translation>
+    </message>
+    <message>
         <source>Settings</source>
         <translation>Réglages</translation>
     </message>

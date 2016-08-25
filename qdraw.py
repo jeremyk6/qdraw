@@ -46,6 +46,7 @@ class Qdraw:
                 QCoreApplication.installTranslator(self.translator)
     
         self.iface = iface
+        self.iface.currentLayerChanged.connect(self.currentLayerChanged)
         self.sb = self.iface.mainWindow().statusBar()
         self.tool = None
         self.toolname = None
@@ -278,13 +279,22 @@ class Qdraw:
     def copyFeatures(self):
         if self.tool:
             self.tool.reset()
-        self.tool = copyFeatures(self.iface, self.settings.getColor())
+        layer = self.iface.legendInterface().currentLayer()
+        self.tool = copyFeatures(self.iface, self.settings.getColor(), self.iface.legendInterface().currentLayer())
         self.tool.setAction(self.actions[8])
-        self.iface.connect(self.tool, SIGNAL("selectionDone()"), self.draw)
         self.iface.mapCanvas().setMapTool(self.tool)
-        self.drawShape = 'polygon'
-        self.toolname = 'drawCopies'
-        self.sb.showMessage(self.tr('Select a vector layer in the Layer Tree, then left click on attributes of this layer on the map. Right Click to confirm.'))
+        if layer is not None and layer.type() == QgsMapLayer.VectorLayer and self.iface.legendInterface().isLayerVisible(layer):
+            self.iface.connect(self.tool, SIGNAL("selectionDone()"), self.draw)
+            self.drawShape = 'polygon'
+            self.toolname = 'drawCopies'
+            self.sb.showMessage(self.tr('Select a vector layer in the Layer Tree, then left click on attributes of this layer on the map. Right Click to confirm.'))
+        else:
+            self.iface.messageBar().pushMessage(self.tr('Attributes copying tool'), self.tr('No vector layer selected !'), level=QgsMessageBar.WARNING, duration=3)
+            self.iface.mapCanvas().unsetMapTool(self.tool)
+    
+    def currentLayerChanged(self, layer):
+        if self.toolname == 'drawCopies':
+            self.copyFeatures()
         
     def showSettingsWindow(self):
         self.iface.connect(self.settings, SIGNAL("settingsChanged()"), self.settingsChanged)
@@ -325,7 +335,7 @@ class Qdraw:
         errBuffer_noAtt = False
         errBuffer_Vertices = False
         
-        if self.toolname == 'drawBuffer' or self.toolname == 'drawCopies':
+        if self.toolname == 'drawBuffer':
             legende = self.iface.legendInterface()
             layer = legende.currentLayer()
             if layer is not None and layer.type() == QgsMapLayer.VectorLayer and legende.isLayerVisible(layer):
@@ -361,6 +371,12 @@ class Qdraw:
                     errBuffer_noAtt = True
             else:
                 warning = True
+                
+        if self.toolname == 'drawCopies':
+            if g.length() < 0:
+                warning = True
+                errBuffer_noAtt = True
+                
             
         if ok and warning == False:
             name = ''
