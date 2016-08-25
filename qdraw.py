@@ -160,6 +160,14 @@ class Qdraw:
             callback=self.drawBuffer,
             parent=self.iface.mainWindow()
         ) 
+        icon_path = ':/plugins/Qgeric/resources/icon_DrawTP.png'
+        self.add_action(
+            icon_path,
+            text=self.tr('Polygon buffer drawing tool on the selected layer'),
+            checkable=True,
+            callback=self.drawPolygonBuffer,
+            parent=self.iface.mainWindow()
+        ) 
         icon_path = ':/plugins/Qgeric/resources/icon_DrawCp.png'
         self.add_action(
             icon_path,
@@ -256,11 +264,22 @@ class Qdraw:
         self.toolname = 'drawBuffer'
         self.sb.showMessage(self.tr('Select a vector layer in the Layer Tree, then left click on an attribute of this layer on the map.'))
         
+    def drawPolygonBuffer(self):
+        if self.tool:
+            self.tool.reset()
+        self.tool = drawPolygon(self.iface, self.settings.getColor())
+        self.tool.setAction(self.actions[7])
+        self.iface.connect(self.tool, SIGNAL("selectionDone()"), self.draw)
+        self.iface.mapCanvas().setMapTool(self.tool)
+        self.drawShape = 'polygon'
+        self.toolname = 'drawBuffer'
+        self.sb.showMessage(self.tr('Left click to place points. Right click to confirm.'))
+        
     def copyFeatures(self):
         if self.tool:
             self.tool.reset()
         self.tool = copyFeatures(self.iface, self.settings.getColor())
-        self.tool.setAction(self.actions[7])
+        self.tool.setAction(self.actions[8])
         self.iface.connect(self.tool, SIGNAL("selectionDone()"), self.draw)
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'polygon'

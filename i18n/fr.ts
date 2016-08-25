@@ -39,6 +39,10 @@
         <translation>Outil de dessin de tampons sur la couche sélectionnée</translation>
     </message>
     <message>
+        <source>Polygon buffer drawing tool on the selected layer</source>
+        <translation>Outil de de dessin de tampon avec sélection polygone sur la couche sélectionnée</translation>
+    </message>
+    <message>
         <source>Attributes copying tool</source>
         <translation>Outil de copie d'attributs</translation>
     </message>
