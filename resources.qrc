@@ -10,6 +10,7 @@
         <file>resources/icon_DrawTP.png</file>
         <file>resources/icon_DrawPt.png</file>
         <file>resources/icon_DrawPtXY.png</file>
+        <file>resources/icon_DrawPtDMS.png</file>
         <file>resources/icon_Settings.png</file>
     </qresource>
 </RCC>

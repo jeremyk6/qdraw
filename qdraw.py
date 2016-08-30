@@ -18,7 +18,7 @@
 #along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt4.QtCore import SIGNAL, QTranslator
-from PyQt4.QtGui import QAction, QIcon
+from PyQt4.QtGui import QAction, QIcon, QMessageBox
 
 from qgis.core import *
 
@@ -121,6 +121,14 @@ class Qdraw:
             callback=self.drawXYPoint,
             parent=self.iface.mainWindow()
         ) 
+        icon_path = ':/plugins/Qgeric/resources/icon_DrawPtDMS.png'
+        self.add_action(
+            icon_path,
+            text=self.tr('DMS Point drawing tool'),
+            checkable=False,
+            callback=self.drawDMSPoint,
+            parent=self.iface.mainWindow()
+        ) 
         icon_path = ':/plugins/Qgeric/resources/icon_DrawL.png'
         self.add_action(
             icon_path,
@@ -209,12 +217,26 @@ class Qdraw:
                 self.tool.rb.addPoint(QgsPoint(y, x))
                 self.drawShape = 'XYpoint'
                 self.draw()
+                
+    def drawDMSPoint(self):
+        point, ok = DMSDialog().getPoint()
+        if ok:
+            if point.x() == 0 and point.y() == 0:
+                QMessageBox.critical(self.iface.mainWindow(), self.tr('Error'), self.tr('Invalid input !'))
+            else:
+                self.drawPoint()
+                self.tool.rb = QgsRubberBand(self.iface.mapCanvas(),QGis.Point)
+                self.tool.rb.setColor( self.settings.getColor() )
+                self.tool.rb.setWidth(3)
+                self.tool.rb.addPoint(point)
+                self.drawShape = 'XYpoint'
+                self.draw()
         
     def drawLine(self):
         if self.tool:
             self.tool.reset()
         self.tool = drawLine(self.iface, self.settings.getColor())
-        self.tool.setAction(self.actions[2])
+        self.tool.setAction(self.actions[3])
         self.iface.connect(self.tool, SIGNAL("selectionDone()"), self.draw)
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'line'
@@ -225,7 +247,7 @@ class Qdraw:
         if self.tool:
             self.tool.reset()
         self.tool = drawRect(self.iface, self.settings.getColor())
-        self.tool.setAction(self.actions[3])
+        self.tool.setAction(self.actions[4])
         self.iface.connect(self.tool, SIGNAL("selectionDone()"), self.draw)
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'polygon'
@@ -236,7 +258,7 @@ class Qdraw:
         if self.tool:
             self.tool.reset()
         self.tool = drawCircle(self.iface, self.settings.getColor(), 40)
-        self.tool.setAction(self.actions[4])
+        self.tool.setAction(self.actions[5])
         self.iface.connect(self.tool, SIGNAL("selectionDone()"), self.draw)
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'polygon'
@@ -247,7 +269,7 @@ class Qdraw:
         if self.tool:
             self.tool.reset()
         self.tool = drawPolygon(self.iface, self.settings.getColor())
-        self.tool.setAction(self.actions[5])
+        self.tool.setAction(self.actions[6])
         self.iface.connect(self.tool, SIGNAL("selectionDone()"), self.draw)
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'polygon'
@@ -258,7 +280,7 @@ class Qdraw:
         if self.tool:
             self.tool.reset()
         self.tool = selectPoint(self.iface, self.settings.getColor())
-        self.tool.setAction(self.actions[6])
+        self.tool.setAction(self.actions[7])
         self.iface.connect(self.tool, SIGNAL("selectionDone()"), self.draw)
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'polygon'
@@ -269,7 +291,7 @@ class Qdraw:
         if self.tool:
             self.tool.reset()
         self.tool = drawPolygon(self.iface, self.settings.getColor())
-        self.tool.setAction(self.actions[7])
+        self.tool.setAction(self.actions[8])
         self.iface.connect(self.tool, SIGNAL("selectionDone()"), self.draw)
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'polygon'
@@ -281,7 +303,7 @@ class Qdraw:
             self.tool.reset()
         layer = self.iface.legendInterface().currentLayer()
         self.tool = copyFeatures(self.iface, self.settings.getColor(), self.iface.legendInterface().currentLayer())
-        self.tool.setAction(self.actions[8])
+        self.tool.setAction(self.actions[9])
         self.iface.mapCanvas().setMapTool(self.tool)
         if layer is not None and layer.type() == QgsMapLayer.VectorLayer and self.iface.legendInterface().isLayerVisible(layer):
             self.iface.connect(self.tool, SIGNAL("selectionDone()"), self.draw)

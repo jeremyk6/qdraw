@@ -323,3 +323,82 @@ class copyFeatures(QgsMapTool):
 
 def tr(message):
     return QCoreApplication.translate('Qdraw', message)
+    
+class DMSDialog(QDialog):
+    def __init__(self):
+        QDialog.__init__(self)
+    
+        self.setWindowTitle(tr('DMS Point Tool'))
+        
+        self.lat_D = QLineEdit()
+        self.lat_M = QLineEdit()
+        self.lat_S = QLineEdit()
+        self.lon_D = QLineEdit()
+        self.lon_M = QLineEdit()
+        self.lon_S = QLineEdit()
+        
+        int_val = QIntValidator()
+        int_val.setBottom(0)
+        
+        float_val = QDoubleValidator()
+        float_val.setBottom(0)
+        
+        self.lat_D.setValidator(int_val)
+        self.lat_M.setValidator(int_val)
+        self.lat_S.setValidator(float_val)
+        
+        self.lon_D.setValidator(int_val)
+        self.lon_M.setValidator(int_val)
+        self.lon_S.setValidator(float_val)
+        
+        self.lat_NS = QComboBox()
+        self.lat_NS.addItem("N")
+        self.lat_NS.addItem("S")
+        
+        self.lon_EW = QComboBox()
+        self.lon_EW.addItem("E")
+        self.lon_EW.addItem("W")
+        
+        buttons =   QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, Qt.Horizontal, self)
+        buttons.accepted.connect(self.accept)
+        buttons.rejected.connect(self.reject)
+       
+        grid = QGridLayout()
+        #grid.setContentsMargins(0,0,0,0)
+        grid.addWidget(QLabel(tr("Latitude")),0,0)
+        grid.addWidget(QLabel(tr("Degrees")),1,0)
+        grid.addWidget(QLabel(tr("Minutes")),1,1)
+        grid.addWidget(QLabel(tr("Seconds")),1,2)
+        grid.addWidget(QLabel(tr("Direction")),1,3)
+        grid.addWidget(self.lat_D,2,0)
+        grid.addWidget(self.lat_M,2,1)
+        grid.addWidget(self.lat_S,2,2)
+        grid.addWidget(self.lat_NS,2,3)
+        grid.addWidget(QLabel(tr("Longitude")),3,0)
+        grid.addWidget(QLabel(tr("Degrees")),4,0)
+        grid.addWidget(QLabel(tr("Minutes")),4,1)
+        grid.addWidget(QLabel(tr("Seconds")),4,2)
+        grid.addWidget(QLabel(tr("Direction")),4,3)
+        grid.addWidget(self.lon_D,5,0)
+        grid.addWidget(self.lon_M,5,1)
+        grid.addWidget(self.lon_S,5,2) 
+        grid.addWidget(self.lon_EW,5,3)         
+        grid.addWidget(buttons,6,2,1,2)
+        
+        self.setLayout(grid)
+        
+    def getPoint(self):
+        dialog = DMSDialog()
+        result = dialog.exec_()
+        
+        latitude = 0
+        longitude = 0
+        if (dialog.lat_D.text().strip() and dialog.lat_M.text().strip() and dialog.lat_S.text().strip()
+            and dialog.lon_D.text().strip() and dialog.lon_M.text().strip() and dialog.lon_S.text().strip()):
+            latitude = int(dialog.lat_D.text())+ float(dialog.lat_M.text())/60 + float(dialog.lat_S.text())/3600
+            if dialog.lat_NS.currentIndex() == 1:
+                latitude *= -1
+            longitude = int(dialog.lon_D.text())+ float(dialog.lon_M.text())/60 + float(dialog.lon_S.text())/3600  
+            if dialog.lon_EW.currentIndex() == 1:
+                longitude *= -1
+        return (QgsPoint(longitude, latitude), result == QDialog.Accepted)

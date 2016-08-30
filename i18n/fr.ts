@@ -142,5 +142,45 @@
         <source>Change the drawing color</source>
         <translation>Changer la couleur de dessin</translation>
     </message>
+    <message>
+        <source>DMS Point Tool</source>
+        <translation>Point en coordonnées DMS</translation>
+    </message>
+    <message>
+        <source>Latitude</source>
+        <translation>Latitude</translation>
+    </message>
+    <message>
+        <source>Longitude</source>
+        <translation>Longitude</translation>
+    </message>
+    <message>
+        <source>Direction</source>
+        <translation>Direction</translation>
+    </message>
+    <message>
+        <source>Degrees</source>
+        <translation>Degrés</translation>
+    </message>
+    <message>
+        <source>Minutes</source>
+        <translation>Minutes</translation>
+    </message>
+    <message>
+        <source>Seconds</source>
+        <translation>Secondes</translation>
+    </message>
+    <message>
+        <source>Invalid input !</source>
+        <translation>Entrée invalide !</translation>
+    </message>
+    <message>
+        <source>DMS Point drawing tool</source>
+        <translation>Dessin de point en coordonnées DMS</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Erreur</translation>
+    </message>
 </context>
 </TS>
