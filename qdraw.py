@@ -205,16 +205,16 @@ class Qdraw:
         self.sb.showMessage(self.tr('Left click to place a point.'))
         
     def drawXYPoint(self):
-        ok = False
-        x, ok = QInputDialog.getDouble(self.iface.mainWindow(), "X", self.tr("Input X:"), min = -180.0000, max = 180.0000, decimals = 6)
+        point, ok = XYDialog().getPoint()
         if ok:
-            y, ok = QInputDialog.getDouble(self.iface.mainWindow(), "Y", self.tr("Input Y:"), min = -90.0000, max = 90.0000, decimals = 6)
-            if ok:    
+            if point.x() == 0 and point.y() == 0:
+                QMessageBox.critical(self.iface.mainWindow(), self.tr('Error'), self.tr('Invalid input !'))
+            else:
                 self.drawPoint()
                 self.tool.rb = QgsRubberBand(self.iface.mapCanvas(),QGis.Point)
                 self.tool.rb.setColor( self.settings.getColor() )
                 self.tool.rb.setWidth(3)
-                self.tool.rb.addPoint(QgsPoint(y, x))
+                self.tool.rb.addPoint(point)
                 self.drawShape = 'XYpoint'
                 self.draw()
                 

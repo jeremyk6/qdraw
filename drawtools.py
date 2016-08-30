@@ -402,3 +402,42 @@ class DMSDialog(QDialog):
             if dialog.lon_EW.currentIndex() == 1:
                 longitude *= -1
         return (QgsPoint(longitude, latitude), result == QDialog.Accepted)
+        
+class XYDialog(QDialog):
+    def __init__(self):
+        QDialog.__init__(self)
+    
+        self.setWindowTitle(tr('XY Point drawing tool'))
+        
+        self.X = QLineEdit()
+        self.Y = QLineEdit()
+        
+        X_val = QDoubleValidator(-180, 180, 6)
+        Y_val = QDoubleValidator(-90, 90, 6)
+        
+        self.X.setValidator(X_val)
+        self.Y.setValidator(Y_val)
+        
+        buttons =   QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, Qt.Horizontal, self)
+        buttons.accepted.connect(self.accept)
+        buttons.rejected.connect(self.reject)
+       
+        grid = QGridLayout()
+        grid.addWidget(QLabel("X"),0,0)
+        grid.addWidget(QLabel("Y"),0,1)
+        grid.addWidget(self.X,1,0)
+        grid.addWidget(self.Y,1,1) 
+        grid.addWidget(buttons,2,0,1,2)
+        
+        self.setLayout(grid)
+        
+    def getPoint(self):
+        dialog = XYDialog()
+        result = dialog.exec_()
+        
+        X = 0
+        Y = 0
+        if dialog.X.text().strip() and dialog.Y.text().strip():
+            X = float(dialog.X.text())
+            Y = float(dialog.Y.text())
+        return (QgsPoint(Y, X), result == QDialog.Accepted)
