@@ -404,6 +404,7 @@ class DMSDialog(QDialog):
         return (QgsPoint(longitude, latitude), result == QDialog.Accepted)
         
 class XYDialog(QDialog):
+    crs = None
     def __init__(self):
         QDialog.__init__(self)
     
@@ -412,11 +413,15 @@ class XYDialog(QDialog):
         self.X = QLineEdit()
         self.Y = QLineEdit()
         
-        X_val = QDoubleValidator(-180, 180, 6)
-        Y_val = QDoubleValidator(-90, 90, 6)
+        X_val = QDoubleValidator()
+        Y_val = QDoubleValidator()
         
         self.X.setValidator(X_val)
         self.Y.setValidator(Y_val)
+        
+        self.crsButton = QPushButton("Projection")
+        self.crsButton.clicked.connect(self.changeCRS)
+        self.crsLabel = QLabel("")
         
         buttons =   QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, Qt.Horizontal, self)
         buttons.accepted.connect(self.accept)
@@ -427,12 +432,23 @@ class XYDialog(QDialog):
         grid.addWidget(QLabel("Y"),0,1)
         grid.addWidget(self.X,1,0)
         grid.addWidget(self.Y,1,1) 
-        grid.addWidget(buttons,2,0,1,2)
+        grid.addWidget(self.crsButton, 2,0)
+        grid.addWidget(self.crsLabel, 2, 1)
+        grid.addWidget(buttons,3,0,1,2)
         
         self.setLayout(grid)
         
-    def getPoint(self):
+    def changeCRS(self):
+        projSelector = QgsGenericProjectionSelector()
+        projSelector.exec_()
+        self.crs.createFromSrsId(projSelector.selectedCrsId())
+        self.crsLabel.setText(self.crs.authid())
+        
+    def getPoint(self, crs):
+        print crs
         dialog = XYDialog()
+        dialog.crs = crs
+        dialog.crsLabel.setText(crs.authid())
         result = dialog.exec_()
         
         X = 0
@@ -440,4 +456,4 @@ class XYDialog(QDialog):
         if dialog.X.text().strip() and dialog.Y.text().strip():
             X = float(dialog.X.text())
             Y = float(dialog.Y.text())
-        return (QgsPoint(Y, X), result == QDialog.Accepted)
+        return ([QgsPoint(X, Y), dialog.crs], result == QDialog.Accepted)

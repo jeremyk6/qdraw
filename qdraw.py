@@ -197,7 +197,9 @@ class Qdraw:
         self.sb.showMessage(self.tr('Left click to place a point.'))
         
     def drawXYPoint(self):
-        point, ok = XYDialog().getPoint()
+        tuple, ok = XYDialog().getPoint(self.iface.mapCanvas().mapRenderer().destinationCrs())
+        point = tuple[0]
+        self.XYcrs = tuple[1]
         if ok:
             if point.x() == 0 and point.y() == 0:
                 QMessageBox.critical(self.iface.mainWindow(), self.tr('Error'), self.tr('Invalid input !'))
@@ -402,7 +404,7 @@ class Qdraw:
             if self.drawShape == 'point':
                 layer = QgsVectorLayer("Point?crs="+self.iface.mapCanvas().mapRenderer().destinationCrs().authid()+"&field="+self.tr('Drawings')+":string(255)",name,"memory")
             elif self.drawShape == 'XYpoint':
-                layer = QgsVectorLayer("Point?crs=epsg:4326"+"&field="+self.tr('Drawings')+":string(255)",name,"memory")
+                layer = QgsVectorLayer("Point?crs="+self.XYcrs.authid()+"&field="+self.tr('Drawings')+":string(255)",name,"memory")
             elif self.drawShape == 'line':
                 layer = QgsVectorLayer("LineString?crs="+self.iface.mapCanvas().mapRenderer().destinationCrs().authid()+"&field="+self.tr('Drawings')+":string(255)",name,"memory")
                 print "LineString?crs="+self.iface.mapCanvas().mapRenderer().destinationCrs().authid()+"&field="+self.tr('Drawings')+":string(255)"
