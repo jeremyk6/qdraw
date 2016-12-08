@@ -2,7 +2,7 @@
 name=Qdraw
 qgisMinimumVersion=2.10
 description=Plugin that makes drawing easier
-version=1.5
+version=1.5.1
 author=Jérémy Kalsron
 email=jeremy.kalsron@gmail.com
 
