@@ -8,7 +8,11 @@
     </message>
     <message>
         <source>XY Point drawing tool</source>
-        <translation>Outil de dessin de point XY</translation>
+        <translation>Outil de dessin de points XY</translation>
+    </message>
+    <message>
+        <source>DMS Point drawing tool</source>
+        <translation>Outil de dessin de points en coordonnées DMS</translation>
     </message>
     <message>
         <source>Input X:</source>
@@ -144,7 +148,7 @@
     </message>
     <message>
         <source>DMS Point Tool</source>
-        <translation>Point en coordonnées DMS</translation>
+        <translation>Outil de dessin de points en coordonnées DMS</translation>
     </message>
     <message>
         <source>Latitude</source>
@@ -173,10 +177,6 @@
     <message>
         <source>Invalid input !</source>
         <translation>Entrée invalide !</translation>
-    </message>
-    <message>
-        <source>DMS Point drawing tool</source>
-        <translation>Dessin de point en coordonnées DMS</translation>
     </message>
     <message>
         <source>Error</source>
