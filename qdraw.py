@@ -214,6 +214,7 @@ class Qdraw:
                 
     def drawDMSPoint(self):
         point, ok = DMSDialog().getPoint()
+        self.XYcrs = QgsCoordinateReferenceSystem(4326)
         if ok:
             if point.x() == 0 and point.y() == 0:
                 QMessageBox.critical(self.iface.mainWindow(), self.tr('Error'), self.tr('Invalid input !'))
