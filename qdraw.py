@@ -404,8 +404,10 @@ class Qdraw:
             layer = None
             if self.drawShape == 'point':
                 layer = QgsVectorLayer("Point?crs="+self.iface.mapCanvas().mapRenderer().destinationCrs().authid()+"&field="+self.tr('Drawings')+":string(255)",name,"memory")
+                g = g.centroid() # force geometry as point
             elif self.drawShape == 'XYpoint':
                 layer = QgsVectorLayer("Point?crs="+self.XYcrs.authid()+"&field="+self.tr('Drawings')+":string(255)",name,"memory")
+                g = g.centroid()
             elif self.drawShape == 'line':
                 layer = QgsVectorLayer("LineString?crs="+self.iface.mapCanvas().mapRenderer().destinationCrs().authid()+"&field="+self.tr('Drawings')+":string(255)",name,"memory")
                 print "LineString?crs="+self.iface.mapCanvas().mapRenderer().destinationCrs().authid()+"&field="+self.tr('Drawings')+":string(255)"
