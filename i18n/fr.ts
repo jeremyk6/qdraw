@@ -182,5 +182,9 @@
         <source>Error</source>
         <translation>Erreur</translation>
     </message>
+    <message>
+        <source>Decimal minutes</source>
+        <translation>Minutes décimales</translation>
+    </message>
 </context>
 </TS>

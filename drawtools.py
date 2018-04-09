@@ -338,9 +338,18 @@ class DMSDialog(QDialog):
         self.lat_D = QLineEdit()
         self.lat_M = QLineEdit()
         self.lat_S = QLineEdit()
+        self.lat_DM = QLineEdit()
         self.lon_D = QLineEdit()
         self.lon_M = QLineEdit()
         self.lon_S = QLineEdit()
+        self.lon_DM = QLineEdit()
+
+        self.lat_M.textEdited.connect(self.lat_MS_edited)
+        self.lat_S.textEdited.connect(self.lat_MS_edited)
+        self.lat_DM.textEdited.connect(self.lat_DM_edited)
+        self.lon_M.textEdited.connect(self.lon_MS_edited)
+        self.lon_S.textEdited.connect(self.lon_MS_edited)
+        self.lon_DM.textEdited.connect(self.lon_DM_edited)
         
         int_val = QIntValidator()
         int_val.setBottom(0)
@@ -351,10 +360,12 @@ class DMSDialog(QDialog):
         self.lat_D.setValidator(int_val)
         self.lat_M.setValidator(int_val)
         self.lat_S.setValidator(float_val)
+        self.lat_DM.setValidator(float_val)
         
         self.lon_D.setValidator(int_val)
         self.lon_M.setValidator(int_val)
         self.lon_S.setValidator(float_val)
+        self.lon_DM.setValidator(float_val)
         
         self.lat_NS = QComboBox()
         self.lat_NS.addItem("N")
@@ -379,16 +390,20 @@ class DMSDialog(QDialog):
         grid.addWidget(self.lat_M,2,1)
         grid.addWidget(self.lat_S,2,2)
         grid.addWidget(self.lat_NS,2,3)
-        grid.addWidget(QLabel(tr("Longitude")),3,0)
-        grid.addWidget(QLabel(tr("Degrees")),4,0)
-        grid.addWidget(QLabel(tr("Minutes")),4,1)
-        grid.addWidget(QLabel(tr("Seconds")),4,2)
-        grid.addWidget(QLabel(tr("Direction")),4,3)
-        grid.addWidget(self.lon_D,5,0)
-        grid.addWidget(self.lon_M,5,1)
-        grid.addWidget(self.lon_S,5,2) 
-        grid.addWidget(self.lon_EW,5,3)         
-        grid.addWidget(buttons,6,2,1,2)
+        grid.addWidget(QLabel(tr("Decimal minutes")),3,1)
+        grid.addWidget(self.lat_DM,4,1,1,2)
+        grid.addWidget(QLabel(tr("Longitude")),5,0)
+        grid.addWidget(QLabel(tr("Degrees")),6,0)
+        grid.addWidget(QLabel(tr("Minutes")),6,1)
+        grid.addWidget(QLabel(tr("Seconds")),6,2)
+        grid.addWidget(QLabel(tr("Direction")),6,3)
+        grid.addWidget(self.lon_D,7,0)
+        grid.addWidget(self.lon_M,7,1)
+        grid.addWidget(self.lon_S,7,2)
+        grid.addWidget(self.lon_EW,7,3)
+        grid.addWidget(QLabel(tr("Decimal minutes")),8,1)
+        grid.addWidget(self.lon_DM,9,1,1,2)
+        grid.addWidget(buttons,10,2,1,2)
         
         self.setLayout(grid)
         
@@ -407,6 +422,52 @@ class DMSDialog(QDialog):
             if dialog.lon_EW.currentIndex() == 1:
                 longitude *= -1
         return (QgsPoint(longitude, latitude), result == QDialog.Accepted)
+
+    def lat_MS_edited(self):
+        if self.lat_M.text().strip():
+            M = int(self.lat_M.text())
+        else:
+            M = 0
+        if self.lat_S.text().strip():
+            S = float(self.lat_S.text())
+        else:
+            S = 0
+        if M==0 and S==0:
+            self.lat_DM.clear()
+        else:
+            self.lat_DM.setText(str(M+(S/60)))
+
+    def lat_DM_edited(self):
+        if self.lat_DM.text().strip():
+            DM = float(self.lat_DM.text())
+            self.lat_M.setText(str(int(DM)))
+            self.lat_S.setText(str((DM-int(DM))*60))
+        else:
+            self.lat_M.clear()
+            self.lat_S.clear()
+
+    def lon_MS_edited(self):
+        if self.lon_M.text().strip():
+            M = int(self.lon_M.text())
+        else:
+            M = 0
+        if self.lon_S.text().strip():
+            S = float(self.lon_S.text())
+        else:
+            S = 0
+        if M==0 and S==0:
+            self.lon_DM.clear()
+        else:
+            self.lon_DM.setText(str(M+(S/60)))
+
+    def lon_DM_edited(self):
+        if self.lon_DM.text().strip():
+            DM = float(self.lon_DM.text())
+            self.lon_M.setText(str(int(DM)))
+            self.lon_S.setText(str((DM-int(DM))*60))
+        else:
+            self.lon_M.clear()
+            self.lon_S.clear()
         
 class XYDialog(QDialog):
     crs = None
