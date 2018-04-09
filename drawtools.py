@@ -200,6 +200,11 @@ class drawLine(QgsMapTool):
       self.rb.setColor( couleur )
       return None
 
+  def keyPressEvent(self, e):
+      if e.matches(QKeySequence.Undo):
+         if self.rb.numberOfVertices() > 1:
+           self.rb.removeLastPoint()
+
   def canvasPressEvent(self,e):
       if e.button() == Qt.LeftButton:
          if self.status == 0:
