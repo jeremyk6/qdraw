@@ -109,15 +109,15 @@ class Qdraw:
         return action
 
     def initGui(self):
-        menu = QMenu()
-        menu.addAction(QIcon(':/plugins/Qgeric/resources/icon_DrawPtXY.png'), self.tr('XY Point drawing tool'), self.drawXYPoint)
-        menu.addAction(QIcon(':/plugins/Qgeric/resources/icon_DrawPtDMS.png'), self.tr('DMS Point drawing tool'), self.drawDMSPoint)
+        pointMenu = QMenu()
+        pointMenu.addAction(QIcon(':/plugins/Qgeric/resources/icon_DrawPtXY.png'), self.tr('XY Point drawing tool'), self.drawXYPoint)
+        pointMenu.addAction(QIcon(':/plugins/Qgeric/resources/icon_DrawPtDMS.png'), self.tr('DMS Point drawing tool'), self.drawDMSPoint)
         icon_path = ':/plugins/Qgeric/resources/icon_DrawPt.png'
         self.add_action(
             icon_path,
             text=self.tr('Point drawing tool'),
             checkable=True,
-            menu = menu,
+            menu = pointMenu,
             callback=self.drawPoint,
             parent=self.iface.mainWindow()
         )
@@ -153,20 +153,17 @@ class Qdraw:
             callback=self.drawPolygon,
             parent=self.iface.mainWindow()
         ) 
+        bufferMenu = QMenu()
+        polygonBufferAction = QAction(QIcon(':/plugins/Qgeric/resources/icon_DrawTP.png'), self.tr('Polygon buffer drawing tool on the selected layer'), bufferMenu)
+        polygonBufferAction.triggered.connect(self.drawPolygonBuffer)
+        bufferMenu.addAction(polygonBufferAction)
         icon_path = ':/plugins/Qgeric/resources/icon_DrawT.png'
         self.add_action(
             icon_path,
             text=self.tr('Buffer drawing tool on the selected layer'),
             checkable=True,
+            menu=bufferMenu,
             callback=self.drawBuffer,
-            parent=self.iface.mainWindow()
-        ) 
-        icon_path = ':/plugins/Qgeric/resources/icon_DrawTP.png'
-        self.add_action(
-            icon_path,
-            text=self.tr('Polygon buffer drawing tool on the selected layer'),
-            checkable=True,
-            callback=self.drawPolygonBuffer,
             parent=self.iface.mainWindow()
         ) 
         icon_path = ':/plugins/Qgeric/resources/icon_DrawCp.png'
@@ -275,6 +272,14 @@ class Qdraw:
         if self.tool:
             self.tool.reset()
         self.tool = selectPoint(self.iface, self.settings.getColor())
+        self.actions[5].setIcon(QIcon(':/plugins/Qgeric/resources/icon_DrawT.png'))
+        self.actions[5].setText(self.tr('Buffer drawing tool on the selected layer'))
+        self.actions[5].triggered.disconnect()
+        self.actions[5].triggered.connect(self.drawBuffer)
+        self.actions[5].menu().actions()[0].setIcon(QIcon(':/plugins/Qgeric/resources/icon_DrawTP.png'))
+        self.actions[5].menu().actions()[0].setText(self.tr('Polygon buffer drawing tool on the selected layer'))
+        self.actions[5].menu().actions()[0].triggered.disconnect()
+        self.actions[5].menu().actions()[0].triggered.connect(self.drawPolygonBuffer)
         self.tool.setAction(self.actions[5])
         self.iface.connect(self.tool, SIGNAL("selectionDone()"), self.draw)
         self.iface.mapCanvas().setMapTool(self.tool)
@@ -286,7 +291,15 @@ class Qdraw:
         if self.tool:
             self.tool.reset()
         self.tool = drawPolygon(self.iface, self.settings.getColor())
-        self.tool.setAction(self.actions[6])
+        self.actions[5].setIcon(QIcon(':/plugins/Qgeric/resources/icon_DrawTP.png'))
+        self.actions[5].setText(self.tr('Polygon buffer drawing tool on the selected layer'))
+        self.actions[5].triggered.disconnect()
+        self.actions[5].triggered.connect(self.drawPolygonBuffer)
+        self.actions[5].menu().actions()[0].setIcon(QIcon(':/plugins/Qgeric/resources/icon_DrawT.png'))
+        self.actions[5].menu().actions()[0].setText(self.tr('Buffer drawing tool on the selected layer'))
+        self.actions[5].menu().actions()[0].triggered.disconnect()
+        self.actions[5].menu().actions()[0].triggered.connect(self.drawBuffer)
+        self.tool.setAction(self.actions[5])
         self.iface.connect(self.tool, SIGNAL("selectionDone()"), self.draw)
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'polygon'
@@ -298,7 +311,7 @@ class Qdraw:
             self.tool.reset()
         layer = self.iface.legendInterface().currentLayer()
         self.tool = copyFeatures(self.iface, self.settings.getColor(), self.iface.legendInterface().currentLayer())
-        self.tool.setAction(self.actions[7])
+        self.tool.setAction(self.actions[6])
         self.iface.mapCanvas().setMapTool(self.tool)
         if layer is not None and layer.type() == QgsMapLayer.VectorLayer and self.iface.legendInterface().isLayerVisible(layer):
             self.iface.connect(self.tool, SIGNAL("selectionDone()"), self.draw)
@@ -318,24 +331,9 @@ class Qdraw:
         self.settings.show() 
       
     # triggered when a setting is changed
-    # reload the current tool so it uses the new settings
     def settingsChanged(self):
-        if self.toolname == 'drawPoint':
-            self.drawPoint()
-        elif self.toolname == 'drawRect':
-            self.drawRect()
-        elif self.toolname == 'drawPolygon':
-            self.drawPolygon()
-        elif self.toolname == 'drawCopies':
-            self.copyFeatures()
-        elif self.toolname == 'drawCircle':
-            self.drawCircle()
-        elif self.toolname == 'drawLine':
-            self.drawLine()
-        elif self.toolname == 'drawBuffer':
-            self.drawBuffer()
-        else:
-            return
+        if self.tool:
+            self.tool.rb.setColor(self.settings.getColor())
             
     def geomTransform(self, geom, crs_orig, crs_dest):
         g = QgsGeometry(geom)
