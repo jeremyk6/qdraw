@@ -375,7 +375,7 @@ class Qdraw:
                     rb.setToGeometry(union_geoms, layer)
                     perim = 0
                     if self.toolname == 'drawBuffer':
-                        perim, ok = QInputDialog.getInt(self.iface.mainWindow(), self.tr('Perimeter'), self.tr('Give a perimeter in m:')+'\n'+self.tr('(works only with metric crs)'), min=0)                       
+                        perim, ok = QInputDialog.getDouble(self.iface.mainWindow(), self.tr('Perimeter'), self.tr('Give a perimeter in m:')+'\n'+self.tr('(works only with metric crs)'), min=0)
                     g = union_geoms.buffer(perim, 40)
                     rb.setToGeometry(g, QgsVectorLayer("Polygon?crs="+layer.crs().authid(),"","memory"))
                     if g.length() == 0 and ok:

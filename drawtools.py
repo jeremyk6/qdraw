@@ -164,7 +164,7 @@ class drawCircle(QgsMapTool):
       if self.rb.numberOfVertices() > 3:
         self.emit( SIGNAL("selectionDone()") )
       else:
-        radius, ok = QInputDialog.getInt(self.iface.mainWindow(), tr('Radius'), tr('Give a radius in m:'), min=0)
+        radius, ok = QInputDialog.getDouble(self.iface.mainWindow(), tr('Radius'), tr('Give a radius in m:'), min=0)
         cp = self.toMapCoordinates(e.pos())
         cp.setX(cp.x()+radius)
         rbcircle(self.rb, self.toMapCoordinates(e.pos()), cp, self.segments)
