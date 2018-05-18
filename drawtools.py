@@ -265,66 +265,33 @@ class selectPoint(QgsMapTool):
       self.iface = iface
       self.rb=QgsRubberBand(self.canvas,QGis.Polygon)
       self.rb.setColor( couleur )
+      self.rbSelect = QgsRubberBand(self.canvas,QGis.Polygon)
       return None
 
   def canvasReleaseEvent(self,e):
       if e.button() == Qt.LeftButton:
-         self.rb.reset( QGis.Polygon )
+         self.rbSelect.reset( QGis.Polygon )
          cp = self.toMapCoordinates(QPoint(e.pos().x()-5, e.pos().y()-5))
-         self.rb.addPoint(cp)
+         self.rbSelect.addPoint(cp)
          cp = self.toMapCoordinates(QPoint(e.pos().x()+5, e.pos().y()-5))
-         self.rb.addPoint(cp)
+         self.rbSelect.addPoint(cp)
          cp = self.toMapCoordinates(QPoint(e.pos().x()+5, e.pos().y()+5))
-         self.rb.addPoint(cp)
+         self.rbSelect.addPoint(cp)
          cp = self.toMapCoordinates(QPoint(e.pos().x()-5, e.pos().y()+5))
-         self.rb.addPoint(cp)
-         self.rb.show()
+         self.rbSelect.addPoint(cp)
+         self.emit( SIGNAL("select()") )
+      else:
          self.emit( SIGNAL("selectionDone()") )
       return None
 
   def reset(self):
       self.rb.reset( QGis.Polygon )
+      self.rbSelect.reset( QGis.Polygon )
 
   def deactivate(self):
     self.rb.reset( QGis.Polygon )
+    self.rbSelect.reset( QGis.Polygon )
     QgsMapTool.deactivate(self)
- 
-class copyFeatures(QgsMapTool):
-  def __init__(self,iface,color,layer):
-      self.canvas = iface.mapCanvas()
-      QgsMapTool.__init__(self, self.canvas)
-      self.iface = iface
-      self.rb = QgsRubberBand(self.canvas, QGis.Polygon)
-      self.rb.setWidth(3)
-      self.color = color
-      self.rb.setColor( color )
-      
-      self.layer = layer
-      
-      self.geom = []
-      
-      return None
-
-  def canvasReleaseEvent(self,e):
-    if e.button() == Qt.LeftButton:
-        point = self.toMapCoordinates(e.pos())
-        geom = QgsGeometry()
-        geom.addPart([point], QGis.Point)
-        features = self.layer.getFeatures(QgsFeatureRequest(geom.boundingBox()))
-        for feature in features:
-            self.rb.addGeometry(feature.geometry(), self.layer)
-            self.rb.show()
-    else:
-        self.emit( SIGNAL("selectionDone()"))
-
-  def reset(self):
-    self.rb.reset( QGis.Polygon )
-    return
-    
-  def deactivate(self):
-    self.rb.reset( QGis.Polygon )
-    QgsMapTool.deactivate(self)
-    return
 
 def tr(message):
     return QCoreApplication.translate('Qdraw', message)

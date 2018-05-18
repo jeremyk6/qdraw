@@ -46,10 +46,11 @@ class Qdraw:
                 QCoreApplication.installTranslator(self.translator)
     
         self.iface = iface
-        self.iface.currentLayerChanged.connect(self.currentLayerChanged)
         self.sb = self.iface.mainWindow().statusBar()
         self.tool = None
         self.toolname = None
+        
+        self.bGeom = None
 
         self.actions = []
         self.menu = '&Qdraw'
@@ -166,14 +167,6 @@ class Qdraw:
             callback=self.drawBuffer,
             parent=self.iface.mainWindow()
         ) 
-        icon_path = ':/plugins/Qgeric/resources/icon_DrawCp.png'
-        self.add_action(
-            icon_path,
-            text=self.tr('Attributes copying tool'),
-            checkable=True,
-            callback=self.copyFeatures,
-            parent=self.iface.mainWindow()
-        ) 
         icon_path = ':/plugins/Qgeric/resources/icon_Settings.png'
         self.add_action(
             icon_path,
@@ -269,6 +262,7 @@ class Qdraw:
         self.sb.showMessage(self.tr('Left click to place points. Right click to confirm.'))
         
     def drawBuffer(self):
+        self.bGeom = None
         if self.tool:
             self.tool.reset()
         self.tool = selectPoint(self.iface, self.settings.getColor())
@@ -281,6 +275,7 @@ class Qdraw:
         self.actions[5].menu().actions()[0].triggered.disconnect()
         self.actions[5].menu().actions()[0].triggered.connect(self.drawPolygonBuffer)
         self.tool.setAction(self.actions[5])
+        self.iface.connect(self.tool, SIGNAL("select()"), self.selectBuffer)
         self.iface.connect(self.tool, SIGNAL("selectionDone()"), self.draw)
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'polygon'
@@ -288,6 +283,7 @@ class Qdraw:
         self.sb.showMessage(self.tr('Select a vector layer in the Layer Tree, then left click on an attribute of this layer on the map.'))
         
     def drawPolygonBuffer(self):
+        self.bGeom = None
         if self.tool:
             self.tool.reset()
         self.tool = drawPolygon(self.iface, self.settings.getColor())
@@ -300,31 +296,11 @@ class Qdraw:
         self.actions[5].menu().actions()[0].triggered.disconnect()
         self.actions[5].menu().actions()[0].triggered.connect(self.drawBuffer)
         self.tool.setAction(self.actions[5])
-        self.iface.connect(self.tool, SIGNAL("selectionDone()"), self.draw)
+        self.iface.connect(self.tool, SIGNAL("selectionDone()"), self.selectBuffer)
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'polygon'
         self.toolname = 'drawBuffer'
         self.sb.showMessage(self.tr('Left click to place points. Right click to confirm.'))
-        
-    def copyFeatures(self):
-        if self.tool:
-            self.tool.reset()
-        layer = self.iface.legendInterface().currentLayer()
-        self.tool = copyFeatures(self.iface, self.settings.getColor(), self.iface.legendInterface().currentLayer())
-        self.tool.setAction(self.actions[6])
-        self.iface.mapCanvas().setMapTool(self.tool)
-        if layer is not None and layer.type() == QgsMapLayer.VectorLayer and self.iface.legendInterface().isLayerVisible(layer):
-            self.iface.connect(self.tool, SIGNAL("selectionDone()"), self.draw)
-            self.drawShape = 'polygon'
-            self.toolname = 'drawCopies'
-            self.sb.showMessage(self.tr('Select a vector layer in the Layer Tree, then left click on attributes of this layer on the map. Right Click to confirm.'))
-        else:
-            self.iface.messageBar().pushMessage(self.tr('Attributes copying tool'), self.tr('No vector layer selected !'), level=QgsMessageBar.WARNING, duration=3)
-            self.iface.mapCanvas().unsetMapTool(self.tool)
-    
-    def currentLayerChanged(self, layer):
-        if self.toolname == 'drawCopies':
-            self.copyFeatures()
         
     def showSettingsWindow(self):
         self.iface.connect(self.settings, SIGNAL("settingsChanged()"), self.settingsChanged)
@@ -341,6 +317,39 @@ class Qdraw:
         g.transform(crsTransform)
         return g
         
+    def selectBuffer(self):
+        rb = self.tool.rb
+        if isinstance(self.tool, drawPolygon):
+            rbSelect = self.tool.rb
+        else:
+            rbSelect = self.tool.rbSelect
+        legende = self.iface.legendInterface()
+        layer = legende.currentLayer()
+        if layer is not None and layer.type() == QgsMapLayer.VectorLayer and legende.isLayerVisible(layer):
+            # rubberband reprojection
+            g = self.geomTransform(rbSelect.asGeometry(), self.iface.mapCanvas().mapRenderer().destinationCrs(), layer.crs())
+            features = layer.getFeatures(QgsFeatureRequest(g.boundingBox()))
+            rbGeom = []
+            for feature in features:
+                geom = feature.geometry()
+                try:
+                    if g.intersects(geom):
+                        rbGeom.append(feature.geometryAndOwnership())
+                except:
+                    # there's an error but it intersects
+                    print 'error with '+layer.name()+' on '+str(feature.id())
+                    rbGeom.append(feature.geometryAndOwnership())
+            if len(rbGeom) > 0:
+                for geometry in rbGeom:
+                    if rbGeom[0].combine(geometry) is not None:
+                        if self.bGeom == None:
+                            self.bGeom = geometry
+                        else:
+                            self.bGeom = self.bGeom.combine(geometry)
+                rb.setToGeometry(self.bGeom, layer)
+        if isinstance(self.tool, drawPolygon):
+            self.draw()
+        
     def draw(self):
         rb = self.tool.rb
         g = rb.asGeometry()
@@ -350,43 +359,21 @@ class Qdraw:
         errBuffer_noAtt = False
         errBuffer_Vertices = False
         
+        legende = self.iface.legendInterface()
+        layer = legende.currentLayer()
+
         if self.toolname == 'drawBuffer':
-            legende = self.iface.legendInterface()
-            layer = legende.currentLayer()
-            if layer is not None and layer.type() == QgsMapLayer.VectorLayer and legende.isLayerVisible(layer):
-                # rubberband reprojection
-                g = self.geomTransform(rb.asGeometry(), self.iface.mapCanvas().mapRenderer().destinationCrs(), layer.crs())
-                features = layer.getFeatures(QgsFeatureRequest(g.boundingBox()))
-                rbGeom = []
-                for feature in features:
-                    geom = feature.geometry()
-                    try:
-                        if g.intersects(geom):
-                            rbGeom.append(feature.geometryAndOwnership())
-                    except:
-                        # there's an error but it intersects
-                        print 'error with '+layer.name()+' on '+str(feature.id())
-                        rbGeom.append(feature.geometryAndOwnership())
-                if len(rbGeom) > 0:
-                    union_geoms = rbGeom[0]
-                    for geometry in rbGeom:
-                        if union_geoms.combine(geometry) is not None:
-                            union_geoms = union_geoms.combine(geometry)
-                    rb.setToGeometry(union_geoms, layer)
-                    perim = 0
-                    if self.toolname == 'drawBuffer':
-                        perim, ok = QInputDialog.getDouble(self.iface.mainWindow(), self.tr('Perimeter'), self.tr('Give a perimeter in m:')+'\n'+self.tr('(works only with metric crs)'), min=0)
-                    g = union_geoms.buffer(perim, 40)
-                    rb.setToGeometry(g, QgsVectorLayer("Polygon?crs="+layer.crs().authid(),"","memory"))
-                    if g.length() == 0 and ok:
-                        warning = True
-                        errBuffer_Vertices = True
-                else:
-                    warning = True
-                    errBuffer_noAtt = True
-            else:
+            if self.bGeom is None:
                 warning = True
-                
+                errBuffer_noAtt = True
+            else:
+                perim, ok = QInputDialog.getDouble(self.iface.mainWindow(), self.tr('Perimeter'), self.tr('Give a perimeter in m:')+'\n'+self.tr('(works only with metric crs)'), min=0)
+                g = self.bGeom.buffer(perim, 40)
+                rb.setToGeometry(g, QgsVectorLayer("Polygon?crs="+layer.crs().authid(),"","memory"))
+                if g.length() == 0 and ok:
+                    warning = True
+                    errBuffer_Vertices = True
+        
         if self.toolname == 'drawCopies':
             if g.length() < 0:
                 warning = True
@@ -434,3 +421,4 @@ class Qdraw:
                 else:
                     self.iface.messageBar().pushMessage(self.tr('Warning'), self.tr('There is no selected layer, or it is not vector nor visible !'), level=QgsMessageBar.WARNING, duration=3)
         self.tool.reset()
+        self.bGeom = None
