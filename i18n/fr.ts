@@ -99,8 +99,8 @@
         <translation>Clic gauche pour placer des points. Clic droit pour valider.</translation>
     </message>
     <message>
-        <source>Select a vector layer in the Layer Tree, then left click on an attribute of this layer on the map.</source>
-        <translation>Sélectionner une couche vecteur dans la liste des couches, puis clic gauche sur un attribut de la couche sur la carte.</translation>
+        <source>Select a vector layer in the Layer Tree, then select an entity on the map.</source>
+        <translation>Sélectionner une couche vecteur dans la liste des couches, puis sélectionner des entités sur la carte.</translation>
     </message>
     <message>
         <source>Select a vector layer in the Layer Tree, then left click on attributes of this layer on the map. Right Click to confirm.</source>
@@ -185,6 +185,14 @@
     <message>
         <source>Decimal minutes</source>
         <translation>Minutes décimales</translation>
+    </message>
+    <message>
+        <source>Area</source>
+        <translation>Surface</translation>
+    </message>
+    <message>
+        <source>Length</source>
+        <translation>Longueur</translation>
     </message>
 </context>
 </TS>

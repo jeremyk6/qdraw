@@ -59,6 +59,7 @@ class drawRect(QgsMapTool):
   def canvasMoveEvent(self, e):
       if not self.isEmittingPoint:
         return
+      self.emit( SIGNAL("move()") )
       self.endPoint = self.toMapCoordinates( e.pos() )
       self.showRect(self.startPoint, self.endPoint)
 
@@ -117,6 +118,7 @@ class drawPolygon(QgsMapTool):
       if self.rb.numberOfVertices() > 0 and self.status == 1:
           self.rb.removeLastPoint(0)
           self.rb.addPoint(self.toMapCoordinates(e.pos()))
+      self.emit( SIGNAL("move()") )
       return None
 
   def reset(self):
@@ -155,6 +157,7 @@ class drawCircle(QgsMapTool):
       cp = self.toMapCoordinates(e.pos())
       rbcircle(self.rb, self.center, cp, self.segments)
       self.rb.show()
+      self.emit( SIGNAL("move()") )
 
   def canvasReleaseEvent(self,e):
       '''La sélection est faîte'''
@@ -223,6 +226,7 @@ class drawLine(QgsMapTool):
       if self.rb.numberOfVertices() > 0 and self.status == 1:
           self.rb.removeLastPoint(0)
           self.rb.addPoint(self.toMapCoordinates(e.pos()))
+      self.emit( SIGNAL("move()") )
       return None
 
   def reset(self):

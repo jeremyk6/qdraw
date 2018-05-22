@@ -184,7 +184,7 @@ class Qdraw:
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'point'
         self.toolname = 'drawPoint'
-        self.sb.showMessage(self.tr('Left click to place a point.'))
+        self.resetSB()
         
     def drawXYPoint(self):
         tuple, ok = XYDialog().getPoint(self.iface.mapCanvas().mapRenderer().destinationCrs())
@@ -223,10 +223,11 @@ class Qdraw:
         self.tool = drawLine(self.iface, self.settings.getColor())
         self.tool.setAction(self.actions[1])
         self.iface.connect(self.tool, SIGNAL("selectionDone()"), self.draw)
+        self.iface.connect(self.tool, SIGNAL("move()"), self.updateSB)
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'line'
         self.toolname = 'drawLine'
-        self.sb.showMessage(self.tr('Left click to place points. Right click to confirm.'))
+        self.resetSB()
         
     def drawRect(self):
         if self.tool:
@@ -234,10 +235,11 @@ class Qdraw:
         self.tool = drawRect(self.iface, self.settings.getColor())
         self.tool.setAction(self.actions[2])
         self.iface.connect(self.tool, SIGNAL("selectionDone()"), self.draw)
+        self.iface.connect(self.tool, SIGNAL("move()"), self.updateSB)
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'polygon'
         self.toolname = 'drawRect'
-        self.sb.showMessage(self.tr('Maintain the left click to draw a rectangle.'))
+        self.resetSB()
         
     def drawCircle(self):
         if self.tool:
@@ -245,10 +247,11 @@ class Qdraw:
         self.tool = drawCircle(self.iface, self.settings.getColor(), 40)
         self.tool.setAction(self.actions[3])
         self.iface.connect(self.tool, SIGNAL("selectionDone()"), self.draw)
+        self.iface.connect(self.tool, SIGNAL("move()"), self.updateSB)
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'polygon'
         self.toolname = 'drawCircle'
-        self.sb.showMessage(self.tr('Maintain the left click to draw a circle. Simple Left click to give a perimeter.'))
+        self.resetSB()
         
     def drawPolygon(self):
         if self.tool:
@@ -256,10 +259,11 @@ class Qdraw:
         self.tool = drawPolygon(self.iface, self.settings.getColor())
         self.tool.setAction(self.actions[4])
         self.iface.connect(self.tool, SIGNAL("selectionDone()"), self.draw)
+        self.iface.connect(self.tool, SIGNAL("move()"), self.updateSB)
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'polygon'
         self.toolname = 'drawPolygon'
-        self.sb.showMessage(self.tr('Left click to place points. Right click to confirm.'))
+        self.resetSB()
         
     def drawBuffer(self):
         self.bGeom = None
@@ -280,7 +284,7 @@ class Qdraw:
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'polygon'
         self.toolname = 'drawBuffer'
-        self.sb.showMessage(self.tr('Select a vector layer in the Layer Tree, then left click on an attribute of this layer on the map.'))
+        self.resetSB()
         
     def drawPolygonBuffer(self):
         self.bGeom = None
@@ -300,7 +304,7 @@ class Qdraw:
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'polygon'
         self.toolname = 'drawBuffer'
-        self.sb.showMessage(self.tr('Left click to place points. Right click to confirm.'))
+        self.resetSB()
         
     def showSettingsWindow(self):
         self.iface.connect(self.settings, SIGNAL("settingsChanged()"), self.settingsChanged)
@@ -310,6 +314,34 @@ class Qdraw:
     def settingsChanged(self):
         if self.tool:
             self.tool.rb.setColor(self.settings.getColor())
+
+    def resetSB(self):
+        if self.toolname == 'drawPoint':
+            self.sb.showMessage(self.tr('Left click to place a point.'))
+        if self.toolname == 'drawLine':
+            self.sb.showMessage(self.tr('Left click to place points. Right click to confirm.'))
+        if self.toolname == 'drawRect':
+            self.sb.showMessage(self.tr('Maintain the left click to draw a rectangle.'))
+        if self.toolname == 'drawCircle':
+            self.sb.showMessage(self.tr('Maintain the left click to draw a circle. Simple Left click to give a perimeter.'))
+        if self.toolname == 'drawPolygon':
+            self.sb.showMessage(self.tr('Left click to place points. Right click to confirm.'))
+        if self.toolname == 'drawBuffer':
+            self.sb.showMessage(self.tr('Select a vector layer in the Layer Tree, then select an entity on the map.'))
+
+    def updateSB(self):
+        g = self.geomTransform(self.tool.rb.asGeometry(), self.iface.mapCanvas().mapRenderer().destinationCrs(), QgsCoordinateReferenceSystem(2154))
+        if self.toolname == 'drawLine':
+            if g.length() >= 0:
+                self.sb.showMessage(self.tr('Length')+': '+str("%.2f"%g.length())+"m")
+            else:
+                self.sb.showMessage(self.tr('Length')+': '+"0m2")
+        else:
+            if g.area() >= 0:
+                self.sb.showMessage(self.tr('Area')+': '+str("%.2f"%g.area())+"m2")
+            else:
+                self.sb.showMessage(self.tr('Area')+': '+"0m2")
+        #self.iface.mapCanvas().mapRenderer().destinationCrs().authid()
             
     def geomTransform(self, geom, crs_orig, crs_dest):
         g = QgsGeometry(geom)
@@ -421,4 +453,5 @@ class Qdraw:
                 else:
                     self.iface.messageBar().pushMessage(self.tr('Warning'), self.tr('There is no selected layer, or it is not vector nor visible !'), level=QgsMessageBar.WARNING, duration=3)
         self.tool.reset()
+        self.resetSB()
         self.bGeom = None
