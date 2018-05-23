@@ -1,22 +1,24 @@
 [general]
 name=Qdraw
 qgisMinimumVersion=2.10
-description=Plugin that makes drawing easier
-version=1.5.2
+description=Draw simple shapes easily
+description[fr]=Dessiner des formes simples facilement
+version=2.0
 author=Jérémy Kalsron
 email=jeremy.kalsron@gmail.com
 
-about=Plugin that makes drawing easier.
+about=Plugin that enables drawing simple shapes without the need to manually create a layer. A new memory layer containing the drawing will be automatically created in a "Drawings" group. This plugin enables drawing points (also with coordinates), lines, rectangles, circles, polygons, and buffers of existing features.
+about[fr]=Ce plugin permet de dessiner des formes simples en éliminant la nécessité de créer manuellement une nouvelle couche. Une nouvelle couche mémoire contenant le dessin sera automatiquement créée dans un groupe "Dessins". Ce plugin permet de dessiner des points (éventuellement en précisant des coordonnées), des lignes, des cercles, des polygones, et des tampons basés sur des entités existantes.
 
 homepage=https://github.com/jeremyk6/qdraw/
 tracker=https://github.com/jeremyk6/qdraw/issues
 repository=https://github.com/jeremyk6/qdraw
 
-tags=drawing, buffer
+tags=draw, buffer, digitizing
 
 category=Plugins
 icon=icon.PNG
 
-experimental=True
+experimental=False
 deprecated=False
 
