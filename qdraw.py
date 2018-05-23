@@ -334,14 +334,14 @@ class Qdraw:
         g = self.geomTransform(self.tool.rb.asGeometry(), self.iface.mapCanvas().mapRenderer().destinationCrs(), QgsCoordinateReferenceSystem(2154))
         if self.toolname == 'drawLine':
             if g.length() >= 0:
-                self.sb.showMessage(self.tr('Length')+': '+str("%.2f"%g.length())+"m")
+                self.sb.showMessage(self.tr('Length')+': '+str("%.2f"%g.length())+" m")
             else:
-                self.sb.showMessage(self.tr('Length')+': '+"0m2")
+                self.sb.showMessage(self.tr('Length')+': '+"0 m")
         else:
             if g.area() >= 0:
-                self.sb.showMessage(self.tr('Area')+': '+str("%.2f"%g.area())+"m2")
+                self.sb.showMessage(self.tr('Area')+': '+str("%.2f"%g.area())+" m"+u'²')
             else:
-                self.sb.showMessage(self.tr('Area')+': '+"0m2")
+                self.sb.showMessage(self.tr('Area')+': '+"0 m"+u'²')
         #self.iface.mapCanvas().mapRenderer().destinationCrs().authid()
             
     def geomTransform(self, geom, crs_orig, crs_dest):
