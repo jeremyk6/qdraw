@@ -194,5 +194,9 @@
         <source>Length</source>
         <translation>Longueur</translation>
     </message>
+    <message>
+        <source>Add to an existing layer</source>
+        <translation>Ajouter à une couche existante</translation>
+    </message>
 </context>
 </TS>

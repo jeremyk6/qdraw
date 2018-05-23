@@ -24,6 +24,7 @@ from qgis.core import *
 
 from drawtools import *
 from qdrawsettings import *
+from qdrawlayerdialog import *
 
 import os
 import resources
@@ -415,21 +416,27 @@ class Qdraw:
         if ok and warning == False:
             name = ''
             ok = True
+            add = False
+            index = 0
+            layers = []
             while not name.strip() and ok == True:
-                name, ok = QInputDialog.getText(self.iface.mainWindow(), self.tr('Drawing'), self.tr('Give a name to the layer:'))
+                name, add, index, layers, ok = QDrawLayerDialog(self.iface, self.drawShape).getName(self.iface, self.drawShape)
         if ok and warning == False:
             layer = None
-            if self.drawShape == 'point':
-                layer = QgsVectorLayer("Point?crs="+self.iface.mapCanvas().mapRenderer().destinationCrs().authid()+"&field="+self.tr('Drawings')+":string(255)",name,"memory")
-                g = g.centroid() # force geometry as point
-            elif self.drawShape == 'XYpoint':
-                layer = QgsVectorLayer("Point?crs="+self.XYcrs.authid()+"&field="+self.tr('Drawings')+":string(255)",name,"memory")
-                g = g.centroid()
-            elif self.drawShape == 'line':
-                layer = QgsVectorLayer("LineString?crs="+self.iface.mapCanvas().mapRenderer().destinationCrs().authid()+"&field="+self.tr('Drawings')+":string(255)",name,"memory")
-                print "LineString?crs="+self.iface.mapCanvas().mapRenderer().destinationCrs().authid()+"&field="+self.tr('Drawings')+":string(255)"
+            if add:
+                layer = layers[index]
             else:
-                layer = QgsVectorLayer("Polygon?crs="+self.iface.mapCanvas().mapRenderer().destinationCrs().authid()+"&field="+self.tr('Drawings')+":string(255)",name,"memory")
+                if self.drawShape == 'point':
+                    layer = QgsVectorLayer("Point?crs="+self.iface.mapCanvas().mapRenderer().destinationCrs().authid()+"&field="+self.tr('Drawings')+":string(255)",name,"memory")
+                    g = g.centroid() # force geometry as point
+                elif self.drawShape == 'XYpoint':
+                    layer = QgsVectorLayer("Point?crs="+self.XYcrs.authid()+"&field="+self.tr('Drawings')+":string(255)",name,"memory")
+                    g = g.centroid()
+                elif self.drawShape == 'line':
+                    layer = QgsVectorLayer("LineString?crs="+self.iface.mapCanvas().mapRenderer().destinationCrs().authid()+"&field="+self.tr('Drawings')+":string(255)",name,"memory")
+                    print "LineString?crs="+self.iface.mapCanvas().mapRenderer().destinationCrs().authid()+"&field="+self.tr('Drawings')+":string(255)"
+                else:
+                    layer = QgsVectorLayer("Polygon?crs="+self.iface.mapCanvas().mapRenderer().destinationCrs().authid()+"&field="+self.tr('Drawings')+":string(255)",name,"memory")
             layer.startEditing()
             symbols = layer.rendererV2().symbols()
             symbols[0].setColor(self.settings.getColor())
@@ -438,11 +445,13 @@ class Qdraw:
             feature.setAttributes([name])
             layer.dataProvider().addFeatures([feature])
             layer.commitChanges()
-            QgsMapLayerRegistry.instance().addMapLayer(layer, False)
-            if QgsProject.instance().layerTreeRoot().findGroup(self.tr('Drawings')) == None:
-                QgsProject.instance().layerTreeRoot().insertChildNode(0,QgsLayerTreeGroup(self.tr('Drawings')))
-            group = QgsProject.instance().layerTreeRoot().findGroup(self.tr('Drawings'))
-            group.insertLayer(0,layer)
+            if not add:
+                QgsMapLayerRegistry.instance().addMapLayer(layer, False)
+                if QgsProject.instance().layerTreeRoot().findGroup(self.tr('Drawings')) == None:
+                    QgsProject.instance().layerTreeRoot().insertChildNode(0,QgsLayerTreeGroup(self.tr('Drawings')))
+                group = QgsProject.instance().layerTreeRoot().findGroup(self.tr('Drawings'))
+                group.insertLayer(0,layer)
+            self.iface.legendInterface().refreshLayerSymbology(layer)
             self.iface.mapCanvas().refresh()
         else:
             if warning:
