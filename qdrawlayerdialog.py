@@ -52,7 +52,7 @@ class QDrawLayerDialog(QDialog):
         buttons.rejected.connect(self.reject)
 
         vbox = QVBoxLayout()
-        vbox.addWidget(QLabel(self.tr("Give a name to the layer:")))
+        vbox.addWidget(QLabel(self.tr("Give a name to the feature:")))
         vbox.addWidget(self.name)
         vbox.addWidget(self.addLayer)
         vbox.addWidget(self.layerBox)

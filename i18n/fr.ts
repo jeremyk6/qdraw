@@ -75,8 +75,8 @@
         <translation>Dessin</translation>
     </message>
     <message>
-        <source>Give a name to the layer:</source>
-        <translation>Nommez la couche:</translation>
+        <source>Give a name to the feature:</source>
+        <translation>Nommez l'entité:</translation>
     </message>
     <message>
         <source>Drawings</source>
