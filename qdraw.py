@@ -425,6 +425,8 @@ class Qdraw:
             layer = None
             if add:
                 layer = layers[index]
+                if self.drawShape in ['point','XYpoint']:
+                    g = g.centroid()
             else:
                 if self.drawShape == 'point':
                     layer = QgsVectorLayer("Point?crs="+self.iface.mapCanvas().mapRenderer().destinationCrs().authid()+"&field="+self.tr('Drawings')+":string(255)",name,"memory")
