@@ -215,11 +215,12 @@ class drawCircle(QgsMapTool):
         self.emit( SIGNAL("selectionDone()") )
       else:
         radius, ok = QInputDialog.getDouble(self.iface.mainWindow(), tr('Radius'), tr('Give a radius in m:'), min=0)
-        cp = self.toMapCoordinates(e.pos())
-        cp.setX(cp.x()+radius)
-        rbcircle(self.rb, self.toMapCoordinates(e.pos()), cp, self.segments)
-        self.rb.show()
-        self.emit( SIGNAL("selectionDone()") )
+        if radius > 0 and ok:
+            cp = self.toMapCoordinates(e.pos())
+            cp.setX(cp.x()+radius)
+            rbcircle(self.rb, self.toMapCoordinates(e.pos()), cp, self.segments)
+            self.rb.show()
+            self.emit( SIGNAL("selectionDone()") )
       return None
 
   def reset(self):
