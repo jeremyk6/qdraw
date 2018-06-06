@@ -198,5 +198,21 @@
         <source>Add to an existing layer</source>
         <translation>Ajouter à une couche existante</translation>
     </message>
+    <message>
+        <source>Give a size in m:</source>
+        <translation>Entrez une taille en m:</translation>
+    </message>
+    <message>
+        <source>Width:</source>
+        <translation>Largeur:</translation>
+    </message>
+    <message>
+        <source>Height:</source>
+        <translation>Hauteur:</translation>
+    </message>
+    <message>
+        <source>Rectangle size</source>
+        <translation>Taille du rectangle</translation>
+    </message>
 </context>
 </TS>

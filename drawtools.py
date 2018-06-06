@@ -54,6 +54,12 @@ class drawRect(QgsMapTool):
           return None
       if self.rb.numberOfVertices() > 3:
         self.emit( SIGNAL("selectionDone()") )
+      else:
+        width, height, ok = RectangleDialog().getSize()
+        if width > 0 and height > 0 and ok:
+            self.rb.addPoint(QgsPoint(self.startPoint.x()+width, self.startPoint.y()-height))
+            self.showRect(self.startPoint, QgsPoint(self.startPoint.x()+width, self.startPoint.y()-height))
+            self.emit( SIGNAL("selectionDone()") )
       return None
 
   def canvasMoveEvent(self, e):
@@ -82,6 +88,47 @@ class drawRect(QgsMapTool):
   def deactivate(self):
       self.rb.reset( True )
       QgsMapTool.deactivate(self)
+
+class RectangleDialog(QDialog):
+    crs = None
+    def __init__(self):
+        QDialog.__init__(self)
+
+        self.setWindowTitle(tr('Rectangle size'))
+
+        self.width = QLineEdit()
+        self.height = QLineEdit()
+
+        width_val = QDoubleValidator()
+        height_val = QDoubleValidator()
+
+        self.width.setValidator(width_val)
+        self.height.setValidator(height_val)
+
+        buttons =   QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, Qt.Horizontal, self)
+        buttons.accepted.connect(self.accept)
+        buttons.rejected.connect(self.reject)
+
+        grid = QGridLayout()
+        grid.addWidget(QLabel(tr('Give a size in m:')),0,0)
+        grid.addWidget(QLabel(tr('Width:')),1,0)
+        grid.addWidget(QLabel(tr('Height:')),1,1)
+        grid.addWidget(self.width,2,0)
+        grid.addWidget(self.height,2,1)
+        grid.addWidget(buttons,3,0,1,2)
+
+        self.setLayout(grid)
+
+    def getSize(self):
+        dialog = RectangleDialog()
+        result = dialog.exec_()
+
+        width = 0
+        height = 0
+        if dialog.width.text().strip() and dialog.height.text().strip():
+            width = float(dialog.width.text())
+            height = float(dialog.height.text())
+        return (width,height, result == QDialog.Accepted)
 
 class drawPolygon(QgsMapTool):
   '''Outil de sélection par polygone, tiré de selectPlusFr'''
