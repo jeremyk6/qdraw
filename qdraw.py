@@ -419,7 +419,7 @@ class Qdraw:
             add = False
             index = 0
             layers = []
-            while not name.strip() and ok == True:
+            while not name.strip() and not add and ok == True:
                 name, add, index, layers, ok = QDrawLayerDialog(self.iface, self.drawShape).getName(self.iface, self.drawShape)
         if ok and warning == False:
             layer = None
