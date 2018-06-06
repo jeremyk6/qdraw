@@ -3,7 +3,7 @@ name=Qdraw
 qgisMinimumVersion=2.10
 description=Draw simple shapes easily
 description[fr]=Dessiner des formes simples facilement
-version=2.0
+version=2.0.1
 author=Jérémy Kalsron
 email=jeremy.kalsron@gmail.com
 
