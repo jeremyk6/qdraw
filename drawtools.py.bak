@@ -19,15 +19,11 @@
 
 # Mainly comes from selectTools.py from Cadre de Permanence by Mederic Ribreux
 
-from __future__ import print_function
-from builtins import str
-from builtins import range
 from qgis.core import *
 from qgis.gui import *
 from math import *
-from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtWidgets import QDialog, QLineEdit, QDialogButtonBox, QGridLayout, QLabel, QGroupBox, QVBoxLayout
-from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence
+from PyQt4.QtCore import Qt, SIGNAL
+from PyQt4.QtGui import QDialog, QLineEdit, QDoubleValidator, QDialogButtonBox, QGridLayout, QLabel, QIntValidator, QGroupBox, QVBoxLayout, QKeySequence
 
 class drawRect(QgsMapTool):
   '''Classe de sélection avec un Rectangle'''
@@ -57,19 +53,19 @@ class drawRect(QgsMapTool):
       if not e.button() == Qt.LeftButton:
           return None
       if self.rb.numberOfVertices() > 3:
-        self.selectionDone.emit()
+        self.emit( SIGNAL("selectionDone()") )
       else:
         width, height, ok = RectangleDialog().getSize()
         if width > 0 and height > 0 and ok:
             self.rb.addPoint(QgsPoint(self.startPoint.x()+width, self.startPoint.y()-height))
             self.showRect(self.startPoint, QgsPoint(self.startPoint.x()+width, self.startPoint.y()-height))
-            self.selectionDone.emit()
+            self.emit( SIGNAL("selectionDone()") )
       return None
 
   def canvasMoveEvent(self, e):
       if not self.isEmittingPoint:
         return
-      self.move.emit()
+      self.emit( SIGNAL("move()") )
       self.endPoint = self.toMapCoordinates( e.pos() )
       self.showRect(self.startPoint, self.endPoint)
 
@@ -160,7 +156,7 @@ class drawPolygon(QgsMapTool):
       else:
          if self.rb.numberOfVertices() > 2:
            self.status = 0
-           self.selectionDone.emit()
+           self.emit( SIGNAL("selectionDone()") )
          else:
            self.reset()
       return None
@@ -169,7 +165,7 @@ class drawPolygon(QgsMapTool):
       if self.rb.numberOfVertices() > 0 and self.status == 1:
           self.rb.removeLastPoint(0)
           self.rb.addPoint(self.toMapCoordinates(e.pos()))
-      self.move.emit()
+      self.emit( SIGNAL("move()") )
       return None
 
   def reset(self):
@@ -208,7 +204,7 @@ class drawCircle(QgsMapTool):
       cp = self.toMapCoordinates(e.pos())
       rbcircle(self.rb, self.center, cp, self.segments)
       self.rb.show()
-      self.move.emit()
+      self.emit( SIGNAL("move()") )
 
   def canvasReleaseEvent(self,e):
       '''La sélection est faîte'''
@@ -216,7 +212,7 @@ class drawCircle(QgsMapTool):
           return None
       self.status = 0
       if self.rb.numberOfVertices() > 3:
-        self.selectionDone.emit()
+        self.emit( SIGNAL("selectionDone()") )
       else:
         radius, ok = QInputDialog.getDouble(self.iface.mainWindow(), tr('Radius'), tr('Give a radius in m:'), min=0)
         if radius > 0 and ok:
@@ -224,7 +220,7 @@ class drawCircle(QgsMapTool):
             cp.setX(cp.x()+radius)
             rbcircle(self.rb, self.toMapCoordinates(e.pos()), cp, self.segments)
             self.rb.show()
-            self.selectionDone.emit()
+            self.emit( SIGNAL("selectionDone()") )
       return None
 
   def reset(self):
@@ -269,7 +265,7 @@ class drawLine(QgsMapTool):
       else:
          if self.rb.numberOfVertices() > 2:
            self.status = 0
-           self.selectionDone.emit()
+           self.emit( SIGNAL("selectionDone()") )
          else:
            self.reset()
       return None
@@ -278,7 +274,7 @@ class drawLine(QgsMapTool):
       if self.rb.numberOfVertices() > 0 and self.status == 1:
           self.rb.removeLastPoint(0)
           self.rb.addPoint(self.toMapCoordinates(e.pos()))
-      self.move.emit()
+      self.emit( SIGNAL("move()") )
       return None
 
   def reset(self):
@@ -303,7 +299,7 @@ class drawPoint(QgsMapTool):
   def canvasReleaseEvent(self,e):
       if e.button() == Qt.LeftButton:
          self.rb.addPoint(self.toMapCoordinates(e.pos()))
-         self.selectionDone.emit()
+         self.emit( SIGNAL("selectionDone()") )
       return None
 
   def reset(self):
@@ -335,9 +331,9 @@ class selectPoint(QgsMapTool):
          self.rbSelect.addPoint(cp)
          cp = self.toMapCoordinates(QPoint(e.pos().x()-5, e.pos().y()+5))
          self.rbSelect.addPoint(cp)
-         self.select.emit()
+         self.emit( SIGNAL("select()") )
       else:
-         self.selectionDone.emit()
+         self.emit( SIGNAL("selectionDone()") )
       return None
 
   def reset(self):
@@ -543,8 +539,7 @@ class XYDialog(QDialog):
         self.crsLabel.setText(self.crs.authid())
 
     def getPoint(self, crs):
-        # fix_print_with_import
-        print(crs)
+        print crs
         dialog = XYDialog()
         dialog.crs = crs
         dialog.crsLabel.setText(crs.authid())

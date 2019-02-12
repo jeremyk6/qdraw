@@ -17,24 +17,19 @@
 #You should have received a copy of the GNU General Public License
 #along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import print_function
-from __future__ import absolute_import
-from builtins import str
-from builtins import object
-from qgis.PyQt.QtCore import QTranslator, QSettings
-from qgis.PyQt.QtWidgets import QAction, QMessageBox, QMenu
-from qgis.PyQt.QtGui import QIcon
+from PyQt4.QtCore import SIGNAL, QTranslator, QSettings
+from PyQt4.QtGui import QAction, QIcon, QMessageBox, QMenu
 
 from qgis.core import *
 
-from .drawtools import *
-from .qdrawsettings import *
-from .qdrawlayerdialog import *
+from drawtools import *
+from qdrawsettings import *
+from qdrawlayerdialog import *
 
 import os
-from . import resources
+import resources
 
-class Qdraw(object):
+class Qdraw:
 
     def __init__(self, iface):
         locale = QSettings().value('locale/userLocale')[0:2]
@@ -375,8 +370,7 @@ class Qdraw(object):
                         rbGeom.append(feature.geometryAndOwnership())
                 except:
                     # there's an error but it intersects
-                    # fix_print_with_import
-                    print('error with '+layer.name()+' on '+str(feature.id()))
+                    print 'error with '+layer.name()+' on '+str(feature.id())
                     rbGeom.append(feature.geometryAndOwnership())
             if len(rbGeom) > 0:
                 for geometry in rbGeom:
@@ -442,8 +436,7 @@ class Qdraw(object):
                     g = g.centroid()
                 elif self.drawShape == 'line':
                     layer = QgsVectorLayer("LineString?crs="+self.iface.mapCanvas().mapRenderer().destinationCrs().authid()+"&field="+self.tr('Drawings')+":string(255)",name,"memory")
-                    # fix_print_with_import
-                    print("LineString?crs="+self.iface.mapCanvas().mapRenderer().destinationCrs().authid()+"&field="+self.tr('Drawings')+":string(255)")
+                    print "LineString?crs="+self.iface.mapCanvas().mapRenderer().destinationCrs().authid()+"&field="+self.tr('Drawings')+":string(255)"
                 else:
                     layer = QgsVectorLayer("Polygon?crs="+self.iface.mapCanvas().mapRenderer().destinationCrs().authid()+"&field="+self.tr('Drawings')+":string(255)",name,"memory")
             layer.startEditing()

@@ -17,11 +17,9 @@
 #You should have received a copy of the GNU General Public License
 #along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from builtins import str
-from qgis.PyQt import QtGui, QtCore
-from qgis.PyQt.QtWidgets import QPushButton, QSlider, QDesktopWidget, QLabel, QColorDialog
-from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtCore import Qt, QCoreApplication
+from PyQt4 import QtGui, QtCore
+from PyQt4.QtGui import QPushButton, QSlider, QDesktopWidget, QLabel, QColorDialog, QColor
+from PyQt4.QtCore import Qt, SIGNAL, QCoreApplication
 
 # window used to change settings (transparency/color)
 class QdrawSettings(QtGui.QWidget):
@@ -58,14 +56,14 @@ class QdrawSettings(QtGui.QWidget):
     def handler_opacitySliderValue(self, val):   
         self.color.setAlpha(val)
         self.lbl_opacity.setText(self.tr('Opacity')+': '+str(int((float(val)/255)*100))+'%')
-        self.settingsChanged.emit()
+        self.emit( SIGNAL("settingsChanged()"))
             
     def handler_chColor(self):
         color = self.dlg_color.getColor(self.color)
         if color.isValid():
             color.setAlpha(self.color.alpha())
             self.color = color
-            self.settingsChanged.emit()
+            self.emit( SIGNAL("settingsChanged()"))
             self.close()
         
     def getColor(self):
