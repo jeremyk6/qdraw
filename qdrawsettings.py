@@ -18,48 +18,47 @@
 #along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from builtins import str
-from qgis.PyQt import QtGui, QtCore
-from qgis.PyQt.QtWidgets import QPushButton, QSlider, QDesktopWidget, QLabel, QColorDialog
+from qgis.PyQt.QtWidgets import QWidget, QPushButton, QSlider, QDesktopWidget, QLabel, QColorDialog, QVBoxLayout
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtCore import Qt, QCoreApplication
 
 # window used to change settings (transparency/color)
-class QdrawSettings(QtGui.QWidget):
+class QdrawSettings(QWidget):
     def __init__(self):
-        QtGui.QWidget.__init__(self)
-        
+        QWidget.__init__(self)
+
         self.setWindowTitle(self.tr('Qdraw - Settings'))
         self.setFixedSize(320,100)
         self.center()
-        
+
         # default color
         self.color = QColor(60,151,255, 255)
-        
+
         self.sld_opacity = QSlider(Qt.Horizontal, self)
         self.sld_opacity.setRange(0,255)
         self.sld_opacity.setValue(255)
         self.sld_opacity.tracking = True
-        self.sld_opacity.valueChanged.connect(self.handler_opacitySliderValue)    
+        self.sld_opacity.valueChanged.connect(self.handler_opacitySliderValue)
         self.lbl_opacity = QLabel(self.tr('Opacity')+ ': 100%', self)
-        
+
         self.dlg_color = QColorDialog(self)
         btn_chColor = QPushButton(self.tr('Change the drawing color'), self)
         btn_chColor.clicked.connect(self.handler_chColor)
-           
-        vbox = QtGui.QVBoxLayout()
+
+        vbox = QVBoxLayout()
         vbox.addWidget(self.lbl_opacity)
         vbox.addWidget(self.sld_opacity)
         vbox.addWidget(btn_chColor)
         self.setLayout(vbox)
-        
+
     def tr(self, message):
         return QCoreApplication.translate('Qdraw', message)
-    
-    def handler_opacitySliderValue(self, val):   
+
+    def handler_opacitySliderValue(self, val):
         self.color.setAlpha(val)
         self.lbl_opacity.setText(self.tr('Opacity')+': '+str(int((float(val)/255)*100))+'%')
         self.settingsChanged.emit()
-            
+
     def handler_chColor(self):
         color = self.dlg_color.getColor(self.color)
         if color.isValid():
@@ -67,18 +66,18 @@ class QdrawSettings(QtGui.QWidget):
             self.color = color
             self.settingsChanged.emit()
             self.close()
-        
+
     def getColor(self):
         return self.color
-    
+
     def center(self):
         screen = QDesktopWidget().screenGeometry()
         size = self.geometry()
         self.move((screen.width()-size.width())/2, (screen.height()-size.height())/2)
-        
+
     def closeEvent(self, e):
         self.clear()
         e.accept()
-        
+
     def clear(self):
         return
