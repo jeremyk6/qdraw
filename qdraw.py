@@ -17,8 +17,8 @@
 #You should have received a copy of the GNU General Public License
 #along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4.QtCore import SIGNAL, QTranslator
-from PyQt4.QtGui import QAction, QIcon, QMessageBox
+from PyQt4.QtCore import SIGNAL, QTranslator, QSettings
+from PyQt4.QtGui import QAction, QIcon, QMessageBox, QMenu
 
 from qgis.core import *
 
@@ -37,7 +37,7 @@ class Qdraw:
             os.path.dirname(__file__),
             'i18n',
             'qdraw_{}.qm'.format(locale))
-        
+
         self.translator = None
         if os.path.exists(locale_path):
             self.translator = QTranslator()
@@ -45,27 +45,27 @@ class Qdraw:
 
             if qVersion() > '4.3.3':
                 QCoreApplication.installTranslator(self.translator)
-    
+
         self.iface = iface
         self.sb = self.iface.mainWindow().statusBar()
         self.tool = None
         self.toolname = None
-        
+
         self.bGeom = None
 
         self.actions = []
         self.menu = '&Qdraw'
         self.toolbar = self.iface.addToolBar('Qdraw')
         self.toolbar.setObjectName('Qdraw')
-        
+
         self.settings = QdrawSettings()
-        
+
     def unload(self):
         for action in self.actions:
             self.iface.removePluginVectorMenu('&Qdraw', action)
             self.iface.removeToolBarIcon(action)
         del self.toolbar
-        
+
     def tr(self, message):
         return QCoreApplication.translate('Qdraw', message)
 
@@ -94,7 +94,7 @@ class Qdraw:
 
         if whats_this is not None:
             action.setWhatsThis(whats_this)
-            
+
         if menu is not None:
             action.setMenu(menu)
 
@@ -130,7 +130,7 @@ class Qdraw:
             checkable=True,
             callback=self.drawLine,
             parent=self.iface.mainWindow()
-        ) 
+        )
         icon_path = ':/plugins/Qgeric/resources/icon_DrawR.png'
         self.add_action(
             icon_path,
@@ -138,7 +138,7 @@ class Qdraw:
             checkable=True,
             callback=self.drawRect,
             parent=self.iface.mainWindow()
-        ) 
+        )
         icon_path = ':/plugins/Qgeric/resources/icon_DrawC.png'
         self.add_action(
             icon_path,
@@ -146,7 +146,7 @@ class Qdraw:
             checkable=True,
             callback=self.drawCircle,
             parent=self.iface.mainWindow()
-        ) 
+        )
         icon_path = ':/plugins/Qgeric/resources/icon_DrawP.png'
         self.add_action(
             icon_path,
@@ -154,7 +154,7 @@ class Qdraw:
             checkable=True,
             callback=self.drawPolygon,
             parent=self.iface.mainWindow()
-        ) 
+        )
         bufferMenu = QMenu()
         polygonBufferAction = QAction(QIcon(':/plugins/Qgeric/resources/icon_DrawTP.png'), self.tr('Polygon buffer drawing tool on the selected layer'), bufferMenu)
         polygonBufferAction.triggered.connect(self.drawPolygonBuffer)
@@ -167,15 +167,15 @@ class Qdraw:
             menu=bufferMenu,
             callback=self.drawBuffer,
             parent=self.iface.mainWindow()
-        ) 
+        )
         icon_path = ':/plugins/Qgeric/resources/icon_Settings.png'
         self.add_action(
             icon_path,
             text=self.tr('Settings'),
             callback=self.showSettingsWindow,
             parent=self.iface.mainWindow()
-        )      
-            
+        )
+
     def drawPoint(self):
         if self.tool:
             self.tool.reset()
@@ -186,7 +186,7 @@ class Qdraw:
         self.drawShape = 'point'
         self.toolname = 'drawPoint'
         self.resetSB()
-        
+
     def drawXYPoint(self):
         tuple, ok = XYDialog().getPoint(self.iface.mapCanvas().mapRenderer().destinationCrs())
         point = tuple[0]
@@ -202,7 +202,7 @@ class Qdraw:
                 self.tool.rb.addPoint(point)
                 self.drawShape = 'XYpoint'
                 self.draw()
-                
+
     def drawDMSPoint(self):
         point, ok = DMSDialog().getPoint()
         self.XYcrs = QgsCoordinateReferenceSystem(4326)
@@ -217,7 +217,7 @@ class Qdraw:
                 self.tool.rb.addPoint(point)
                 self.drawShape = 'XYpoint'
                 self.draw()
-        
+
     def drawLine(self):
         if self.tool:
             self.tool.reset()
@@ -229,7 +229,7 @@ class Qdraw:
         self.drawShape = 'line'
         self.toolname = 'drawLine'
         self.resetSB()
-        
+
     def drawRect(self):
         if self.tool:
             self.tool.reset()
@@ -241,7 +241,7 @@ class Qdraw:
         self.drawShape = 'polygon'
         self.toolname = 'drawRect'
         self.resetSB()
-        
+
     def drawCircle(self):
         if self.tool:
             self.tool.reset()
@@ -253,7 +253,7 @@ class Qdraw:
         self.drawShape = 'polygon'
         self.toolname = 'drawCircle'
         self.resetSB()
-        
+
     def drawPolygon(self):
         if self.tool:
             self.tool.reset()
@@ -265,7 +265,7 @@ class Qdraw:
         self.drawShape = 'polygon'
         self.toolname = 'drawPolygon'
         self.resetSB()
-        
+
     def drawBuffer(self):
         self.bGeom = None
         if self.tool:
@@ -286,7 +286,7 @@ class Qdraw:
         self.drawShape = 'polygon'
         self.toolname = 'drawBuffer'
         self.resetSB()
-        
+
     def drawPolygonBuffer(self):
         self.bGeom = None
         if self.tool:
@@ -306,11 +306,11 @@ class Qdraw:
         self.drawShape = 'polygon'
         self.toolname = 'drawBuffer'
         self.resetSB()
-        
+
     def showSettingsWindow(self):
         self.iface.connect(self.settings, SIGNAL("settingsChanged()"), self.settingsChanged)
-        self.settings.show() 
-      
+        self.settings.show()
+
     # triggered when a setting is changed
     def settingsChanged(self):
         if self.tool:
@@ -343,13 +343,13 @@ class Qdraw:
             else:
                 self.sb.showMessage(self.tr('Area')+': '+"0 m"+u'²')
         #self.iface.mapCanvas().mapRenderer().destinationCrs().authid()
-            
+
     def geomTransform(self, geom, crs_orig, crs_dest):
         g = QgsGeometry(geom)
         crsTransform = QgsCoordinateTransform(crs_orig, crs_dest)
         g.transform(crsTransform)
         return g
-        
+
     def selectBuffer(self):
         rb = self.tool.rb
         if isinstance(self.tool, drawPolygon):
@@ -382,16 +382,16 @@ class Qdraw:
                 rb.setToGeometry(self.bGeom, layer)
         if isinstance(self.tool, drawPolygon):
             self.draw()
-        
+
     def draw(self):
         rb = self.tool.rb
         g = rb.asGeometry()
-        
+
         ok = True
         warning = False
         errBuffer_noAtt = False
         errBuffer_Vertices = False
-        
+
         legende = self.iface.legendInterface()
         layer = legende.currentLayer()
 
@@ -406,13 +406,13 @@ class Qdraw:
                 if g.length() == 0 and ok:
                     warning = True
                     errBuffer_Vertices = True
-        
+
         if self.toolname == 'drawCopies':
             if g.length() < 0:
                 warning = True
                 errBuffer_noAtt = True
-                
-            
+
+
         if ok and warning == False:
             name = ''
             ok = True

@@ -22,8 +22,8 @@
 from qgis.core import *
 from qgis.gui import *
 from math import *
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt4.QtCore import Qt, SIGNAL
+from PyQt4.QtGui import QDialog, QLineEdit, QDoubleValidator, QDialogButtonBox, QGridLayout, QLabel, QIntValidator, QGroupBox, QVBoxLayout, QKeySequence
 
 class drawRect(QgsMapTool):
   '''Classe de sélection avec un Rectangle'''
@@ -141,7 +141,7 @@ class drawPolygon(QgsMapTool):
       self.rb=QgsRubberBand(self.canvas,QGis.Polygon)
       self.rb.setColor( couleur )
       return None
-      
+
   def keyPressEvent(self, e):
       if e.matches(QKeySequence.Undo):
          if self.rb.numberOfVertices() > 1:
@@ -160,7 +160,7 @@ class drawPolygon(QgsMapTool):
          else:
            self.reset()
       return None
-    
+
   def canvasMoveEvent(self,e):
       if self.rb.numberOfVertices() > 0 and self.status == 1:
           self.rb.removeLastPoint(0)
@@ -196,7 +196,7 @@ class drawCircle(QgsMapTool):
       self.center = self.toMapCoordinates(e.pos())
       rbcircle(self.rb, self.center, self.center, self.segments)
       return
-    
+
   def canvasMoveEvent(self,e):
       if not self.status == 1:
           return
@@ -238,7 +238,7 @@ def rbcircle(rb,center,edgePoint,N):
     for itheta in range(N+1):
         theta = itheta*(2.0 * pi/N)
         rb.addPoint(QgsPoint(center.x()+r*cos(theta),center.y()+r*sin(theta)))
-    return 
+    return
 
 class drawLine(QgsMapTool):
   def __init__(self,iface, couleur):
@@ -269,7 +269,7 @@ class drawLine(QgsMapTool):
          else:
            self.reset()
       return None
-    
+
   def canvasMoveEvent(self,e):
       if self.rb.numberOfVertices() > 0 and self.status == 1:
           self.rb.removeLastPoint(0)
@@ -347,13 +347,13 @@ class selectPoint(QgsMapTool):
 
 def tr(message):
     return QCoreApplication.translate('Qdraw', message)
-    
+
 class DMSDialog(QDialog):
     def __init__(self):
         QDialog.__init__(self)
-    
+
         self.setWindowTitle(tr('DMS Point Tool'))
-        
+
         self.lat_D = QLineEdit()
         self.lat_M = QLineEdit()
         self.lat_S = QLineEdit()
@@ -369,31 +369,31 @@ class DMSDialog(QDialog):
         self.lon_M.textEdited.connect(self.lon_MS_edited)
         self.lon_S.textEdited.connect(self.lon_MS_edited)
         self.lon_DM.textEdited.connect(self.lon_DM_edited)
-        
+
         int_val = QIntValidator()
         int_val.setBottom(0)
-        
+
         float_val = QDoubleValidator()
         float_val.setBottom(0)
-        
+
         self.lat_D.setValidator(int_val)
         self.lat_M.setValidator(int_val)
         self.lat_S.setValidator(float_val)
         self.lat_DM.setValidator(float_val)
-        
+
         self.lon_D.setValidator(int_val)
         self.lon_M.setValidator(int_val)
         self.lon_S.setValidator(float_val)
         self.lon_DM.setValidator(float_val)
-        
+
         self.lat_NS = QComboBox()
         self.lat_NS.addItem("N")
         self.lat_NS.addItem("S")
-        
+
         self.lon_EW = QComboBox()
         self.lon_EW.addItem("E")
         self.lon_EW.addItem("W")
-        
+
         buttons =   QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, Qt.Horizontal, self)
         buttons.accepted.connect(self.accept)
         buttons.rejected.connect(self.reject)
@@ -427,18 +427,18 @@ class DMSDialog(QDialog):
         lon_grid.addWidget(QLabel(tr("Decimal minutes")),2,1)
         lon_grid.addWidget(self.lon_DM,3,1,1,2)
         lon_grp.setLayout(lon_grid)
-       
+
         vbox = QVBoxLayout()
         vbox.addWidget(lat_grp)
         vbox.addWidget(lon_grp)
         vbox.addWidget(buttons)
-        
+
         self.setLayout(vbox)
-        
+
     def getPoint(self):
         dialog = DMSDialog()
         result = dialog.exec_()
-        
+
         latitude = 0
         longitude = 0
         if (dialog.lat_D.text().strip() and dialog.lat_M.text().strip() and dialog.lat_S.text().strip()
@@ -446,7 +446,7 @@ class DMSDialog(QDialog):
             latitude = int(dialog.lat_D.text())+ float(dialog.lat_M.text())/60 + float(dialog.lat_S.text())/3600
             if dialog.lat_NS.currentIndex() == 1:
                 latitude *= -1
-            longitude = int(dialog.lon_D.text())+ float(dialog.lon_M.text())/60 + float(dialog.lon_S.text())/3600  
+            longitude = int(dialog.lon_D.text())+ float(dialog.lon_M.text())/60 + float(dialog.lon_S.text())/3600
             if dialog.lon_EW.currentIndex() == 1:
                 longitude *= -1
         return (QgsPoint(longitude, latitude), result == QDialog.Accepted)
@@ -496,55 +496,55 @@ class DMSDialog(QDialog):
         else:
             self.lon_M.clear()
             self.lon_S.clear()
-        
+
 class XYDialog(QDialog):
     crs = None
     def __init__(self):
         QDialog.__init__(self)
-    
+
         self.setWindowTitle(tr('XY Point drawing tool'))
-        
+
         self.X = QLineEdit()
         self.Y = QLineEdit()
-        
+
         X_val = QDoubleValidator()
         Y_val = QDoubleValidator()
-        
+
         self.X.setValidator(X_val)
         self.Y.setValidator(Y_val)
-        
+
         self.crsButton = QPushButton("Projection")
         self.crsButton.clicked.connect(self.changeCRS)
         self.crsLabel = QLabel("")
-        
+
         buttons =   QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, Qt.Horizontal, self)
         buttons.accepted.connect(self.accept)
         buttons.rejected.connect(self.reject)
-       
+
         grid = QGridLayout()
         grid.addWidget(QLabel("X"),0,0)
         grid.addWidget(QLabel("Y"),0,1)
         grid.addWidget(self.X,1,0)
-        grid.addWidget(self.Y,1,1) 
+        grid.addWidget(self.Y,1,1)
         grid.addWidget(self.crsButton, 2,0)
         grid.addWidget(self.crsLabel, 2, 1)
         grid.addWidget(buttons,3,0,1,2)
-        
+
         self.setLayout(grid)
-        
+
     def changeCRS(self):
         projSelector = QgsGenericProjectionSelector()
         projSelector.exec_()
         self.crs.createFromSrsId(projSelector.selectedCrsId())
         self.crsLabel.setText(self.crs.authid())
-        
+
     def getPoint(self, crs):
         print crs
         dialog = XYDialog()
         dialog.crs = crs
         dialog.crsLabel.setText(crs.authid())
         result = dialog.exec_()
-        
+
         X = 0
         Y = 0
         if dialog.X.text().strip() and dialog.Y.text().strip():

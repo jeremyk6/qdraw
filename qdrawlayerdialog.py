@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt4.QtCore import QCoreApplication
+from PyQt4.QtGui import QDialog, QComboBox, QLineEdit
 
 class QDrawLayerDialog(QDialog):
     def __init__(self, iface, gtype):
@@ -35,6 +35,7 @@ class QDrawLayerDialog(QDialog):
         else:
             gtype = 'Polygon'
 
+        #change here by QgsMapLayerComboBox()
         self.layerBox = QComboBox()
         self.layers = []
         for layer in iface.legendInterface().layers():
