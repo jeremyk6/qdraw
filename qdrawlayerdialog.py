@@ -18,7 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from qgis.PyQt.QtCore import QCoreApplication
-from qgis.PyQt.QtWidgets import QDialog, QComboBox, QLineEdit
+from qgis.PyQt.QtWidgets import QDialog, QComboBox, QLineEdit, QVBoxLayout
 
 class QDrawLayerDialog(QDialog):
     def __init__(self, iface, gtype):

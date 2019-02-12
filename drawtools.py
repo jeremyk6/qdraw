@@ -30,66 +30,66 @@ from qgis.PyQt.QtWidgets import QDialog, QLineEdit, QDialogButtonBox, QGridLayou
 from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence
 
 class drawRect(QgsMapTool):
-  '''Classe de sélection avec un Rectangle'''
-  def __init__(self, iface, couleur):
-      self.canvas = iface.mapCanvas()
-      QgsMapToolEmitPoint.__init__(self, self.canvas)
-      self.iface = iface
-      self.rb=QgsRubberBand(self.canvas,QGis.Polygon)
-      self.rb.setColor( couleur )
-      self.reset()
-      return None
+    '''Classe de sélection avec un Rectangle'''
+    def __init__(self, iface, couleur):
+        self.canvas = iface.mapCanvas()
+        QgsMapToolEmitPoint.__init__(self, self.canvas)
+        self.iface = iface
+        self.rb=QgsRubberBand(self.canvas, QgsWkbTypes.PolygonGeometry)
+        self.rb.setColor( couleur )
+        self.reset()
+        return None
 
-  def reset(self):
-      self.startPoint = self.endPoint = None
-      self.isEmittingPoint = False
-      self.rb.reset( True )	# true, its a polygon
+    def reset(self):
+        self.startPoint = self.endPoint = None
+        self.isEmittingPoint = False
+        self.rb.reset( True )	# true, its a polygon
 
-  def canvasPressEvent(self, e):
-      if not e.button() == Qt.LeftButton:
-          return
-      self.startPoint = self.toMapCoordinates( e.pos() )
-      self.endPoint = self.startPoint
-      self.isEmittingPoint = True
+    def canvasPressEvent(self, e):
+        if not e.button() == Qt.LeftButton:
+            return
+        self.startPoint = self.toMapCoordinates( e.pos() )
+        self.endPoint = self.startPoint
+        self.isEmittingPoint = True
 
-  def canvasReleaseEvent(self, e):
-      self.isEmittingPoint = False
-      if not e.button() == Qt.LeftButton:
-          return None
-      if self.rb.numberOfVertices() > 3:
-        self.selectionDone.emit()
-      else:
-        width, height, ok = RectangleDialog().getSize()
+    def canvasReleaseEvent(self, e):
+        self.isEmittingPoint = False
+        if not e.button() == Qt.LeftButton:
+            return None
+        if self.rb.numberOfVertices() > 3:
+            self.selectionDone.emit()
+        else:
+            width, height, ok = RectangleDialog().getSize()
         if width > 0 and height > 0 and ok:
             self.rb.addPoint(QgsPoint(self.startPoint.x()+width, self.startPoint.y()-height))
             self.showRect(self.startPoint, QgsPoint(self.startPoint.x()+width, self.startPoint.y()-height))
             self.selectionDone.emit()
-      return None
+        return None
 
-  def canvasMoveEvent(self, e):
-      if not self.isEmittingPoint:
-        return
-      self.move.emit()
-      self.endPoint = self.toMapCoordinates( e.pos() )
-      self.showRect(self.startPoint, self.endPoint)
+    def canvasMoveEvent(self, e):
+        if not self.isEmittingPoint:
+            return
+        self.move.emit()
+        self.endPoint = self.toMapCoordinates( e.pos() )
+        self.showRect(self.startPoint, self.endPoint)
 
-  def showRect(self, startPoint, endPoint):
-      self.rb.reset(QGis.Polygon)	# true, it's a polygon
-      if startPoint.x() == endPoint.x() or startPoint.y() == endPoint.y():
-        return
+    def showRect(self, startPoint, endPoint):
+        self.rb.reset(QgsWkbTypes.PolygonGeometry)	# true, it's a polygon
+        if startPoint.x() == endPoint.x() or startPoint.y() == endPoint.y():
+            return
 
-      point1 = QgsPoint(startPoint.x(), startPoint.y())
-      point2 = QgsPoint(startPoint.x(), endPoint.y())
-      point3 = QgsPoint(endPoint.x(), endPoint.y())
-      point4 = QgsPoint(endPoint.x(), startPoint.y())
+        point1 = QgsPoint(startPoint.x(), startPoint.y())
+        point2 = QgsPoint(startPoint.x(), endPoint.y())
+        point3 = QgsPoint(endPoint.x(), endPoint.y())
+        point4 = QgsPoint(endPoint.x(), startPoint.y())
 
-      self.rb.addPoint( point1, False )
-      self.rb.addPoint( point2, False )
-      self.rb.addPoint( point3, False )
-      self.rb.addPoint( point4, True  )	# true to update canvas
-      self.rb.show()
+        self.rb.addPoint( point1, False )
+        self.rb.addPoint( point2, False )
+        self.rb.addPoint( point3, False )
+        self.rb.addPoint( point4, True  )	# true to update canvas
+        self.rb.show()
 
-  def deactivate(self):
+    def deactivate(self):
       self.rb.reset( True )
       QgsMapTool.deactivate(self)
 
@@ -142,7 +142,7 @@ class drawPolygon(QgsMapTool):
       self.canvas = canvas
       self.iface = iface
       self.status = 0
-      self.rb=QgsRubberBand(self.canvas,QGis.Polygon)
+      self.rb=QgsRubberBand(self.canvas,QgsWkbTypes.PolygonGeometry)
       self.rb.setColor( couleur )
       return None
 
@@ -154,7 +154,7 @@ class drawPolygon(QgsMapTool):
   def canvasPressEvent(self,e):
       if e.button() == Qt.LeftButton:
          if self.status == 0:
-           self.rb.reset( QGis.Polygon )
+           self.rb.reset( QgsWkbTypes.PolygonGeometry )
            self.status = 1
          self.rb.addPoint(self.toMapCoordinates(e.pos()))
       else:
@@ -189,7 +189,7 @@ class drawCircle(QgsMapTool):
       self.iface = iface
       self.status = 0
       self.segments = segments
-      self.rb=QgsRubberBand(self.canvas, QGis.Polygon)
+      self.rb=QgsRubberBand(self.canvas, QgsWkbTypes.PolygonGeometry)
       self.rb.setColor( color )
       return None
 
@@ -238,7 +238,7 @@ class drawCircle(QgsMapTool):
 def rbcircle(rb,center,edgePoint,N):
     '''Fonction qui affiche une rubberband sous forme de cercle'''
     r = sqrt(center.sqrDist(edgePoint))
-    rb.reset( QGis.Polygon )
+    rb.reset( QgsWkbTypes.PolygonGeometry )
     for itheta in range(N+1):
         theta = itheta*(2.0 * pi/N)
         rb.addPoint(QgsPoint(center.x()+r*cos(theta),center.y()+r*sin(theta)))
@@ -251,7 +251,7 @@ class drawLine(QgsMapTool):
       self.canvas = canvas
       self.iface = iface
       self.status = 0
-      self.rb=QgsRubberBand(self.canvas,QGis.Line)
+      self.rb=QgsRubberBand(self.canvas, QgsWkbTypes.LineGeometry)
       self.rb.setColor( couleur )
       return None
 
@@ -263,7 +263,7 @@ class drawLine(QgsMapTool):
   def canvasPressEvent(self,e):
       if e.button() == Qt.LeftButton:
          if self.status == 0:
-           self.rb.reset( QGis.Line )
+           self.rb.reset( QgsWkbTypes.LineGeometry )
            self.status = 1
          self.rb.addPoint(self.toMapCoordinates(e.pos()))
       else:
@@ -283,10 +283,10 @@ class drawLine(QgsMapTool):
 
   def reset(self):
       self.status = 0
-      self.rb.reset( QGis.Line )
+      self.rb.reset( QgsWkbTypes.LineGeometry )
 
   def deactivate(self):
-    self.rb.reset( QGis.Line )
+    self.rb.reset( QgsWkbTypes.LineGeometry )
     QgsMapTool.deactivate(self)
 
 class drawPoint(QgsMapTool):
@@ -295,7 +295,7 @@ class drawPoint(QgsMapTool):
       QgsMapTool.__init__(self,canvas)
       self.canvas = canvas
       self.iface = iface
-      self.rb=QgsRubberBand(self.canvas,QGis.Point)
+      self.rb=QgsRubberBand(self.canvas, QgsWkbTypes.PointGeometry)
       self.rb.setColor( couleur )
       self.rb.setWidth(3)
       return None
@@ -307,10 +307,10 @@ class drawPoint(QgsMapTool):
       return None
 
   def reset(self):
-      self.rb.reset( QGis.Point )
+      self.rb.reset( QgsWkbTypes.PointGeometry )
 
   def deactivate(self):
-    self.rb.reset( QGis.Point )
+    self.rb.reset( QgsWkbTypes.PointGeometry )
     QgsMapTool.deactivate(self)
 
 class selectPoint(QgsMapTool):
@@ -319,14 +319,14 @@ class selectPoint(QgsMapTool):
       QgsMapTool.__init__(self,canvas)
       self.canvas = canvas
       self.iface = iface
-      self.rb=QgsRubberBand(self.canvas,QGis.Polygon)
+      self.rb=QgsRubberBand(self.canvas,QgsWkbTypes.PolygonGeometry)
       self.rb.setColor( couleur )
-      self.rbSelect = QgsRubberBand(self.canvas,QGis.Polygon)
+      self.rbSelect = QgsRubberBand(self.canvas,QgsWkbTypes.PolygonGeometry)
       return None
 
   def canvasReleaseEvent(self,e):
       if e.button() == Qt.LeftButton:
-         self.rbSelect.reset( QGis.Polygon )
+         self.rbSelect.reset( QgsWkbTypes.PolygonGeometry )
          cp = self.toMapCoordinates(QPoint(e.pos().x()-5, e.pos().y()-5))
          self.rbSelect.addPoint(cp)
          cp = self.toMapCoordinates(QPoint(e.pos().x()+5, e.pos().y()-5))
@@ -341,12 +341,12 @@ class selectPoint(QgsMapTool):
       return None
 
   def reset(self):
-      self.rb.reset( QGis.Polygon )
-      self.rbSelect.reset( QGis.Polygon )
+      self.rb.reset( QgsWkbTypes.PolygonGeometry )
+      self.rbSelect.reset( QgsWkbTypes.PolygonGeometry )
 
   def deactivate(self):
-    self.rb.reset( QGis.Polygon )
-    self.rbSelect.reset( QGis.Polygon )
+    self.rb.reset( QgsWkbTypes.PolygonGeometry )
+    self.rbSelect.reset( QgsWkbTypes.PolygonGeometry )
     QgsMapTool.deactivate(self)
 
 def tr(message):
