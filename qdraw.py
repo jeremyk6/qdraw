@@ -124,7 +124,7 @@ class Qdraw(object):
             icon_path,
             text=self.tr('Point drawing tool'),
             checkable=True,
-            menu = pointMenu,
+            menu=pointMenu,
             callback=self.drawPoint,
             parent=self.iface.mainWindow()
         )
@@ -186,7 +186,7 @@ class Qdraw(object):
             self.tool.reset()
         self.tool = drawPoint(self.iface, self.settings.getColor())
         self.tool.setAction(self.actions[0])
-        self.iface.connect(self.tool, SIGNAL("selectionDone()"), self.draw)
+        self.tool.selectionDone.connect(self.draw)
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'point'
         self.toolname = 'drawPoint'
