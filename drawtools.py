@@ -22,33 +22,41 @@
 from __future__ import print_function
 from builtins import str
 from builtins import range
+
+from qgis.gui import QgsMapTool, QgsRubberBand, QgsMapToolEmitPoint
+from qgis.core import QgsWkbTypes, QgsPointXY
+
 from qgis.core import *
 from qgis.gui import *
 from math import *
+
 from qgis.PyQt.QtCore import Qt, QCoreApplication, pyqtSignal
-from qgis.PyQt.QtWidgets import QDialog, QLineEdit, QDialogButtonBox, QGridLayout, QLabel, QGroupBox, QVBoxLayout
+from qgis.PyQt.QtWidgets import QDialog, QLineEdit, QDialogButtonBox, \
+    QGridLayout, QLabel, QGroupBox, QVBoxLayout, QComboBox
 from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence
+
 
 class drawRect(QgsMapTool):
     '''Classe de sélection avec un Rectangle'''
+
     def __init__(self, iface, couleur):
         self.canvas = iface.mapCanvas()
         QgsMapToolEmitPoint.__init__(self, self.canvas)
         self.iface = iface
-        self.rb=QgsRubberBand(self.canvas, QgsWkbTypes.PolygonGeometry)
-        self.rb.setColor( couleur )
+        self.rb = QgsRubberBand(self.canvas, QgsWkbTypes.PolygonGeometry)
+        self.rb.setColor(couleur)
         self.reset()
         return None
 
     def reset(self):
         self.startPoint = self.endPoint = None
         self.isEmittingPoint = False
-        self.rb.reset( True )	# true, its a polygon
+        self.rb.reset(True)	 # true, its a polygon
 
     def canvasPressEvent(self, e):
         if not e.button() == Qt.LeftButton:
             return
-        self.startPoint = self.toMapCoordinates( e.pos() )
+        self.startPoint = self.toMapCoordinates(e.pos())
         self.endPoint = self.startPoint
         self.isEmittingPoint = True
 
@@ -61,8 +69,13 @@ class drawRect(QgsMapTool):
         else:
             width, height, ok = RectangleDialog().getSize()
         if width > 0 and height > 0 and ok:
-            self.rb.addPoint(QgsPointXY(self.startPoint.x()+width, self.startPoint.y()-height))
-            self.showRect(self.startPoint, QgsPointXY(self.startPoint.x()+width, self.startPoint.y()-height))
+            self.rb.addPoint(
+                QgsPointXY(
+                    self.startPoint.x()+width, self.startPoint.y()-height))
+            self.showRect(
+                self.startPoint,
+                QgsPointXY(
+                    self.startPoint.x()+width, self.startPoint.y()-height))
             self.selectionDone.emit()
         return None
 
@@ -70,11 +83,11 @@ class drawRect(QgsMapTool):
         if not self.isEmittingPoint:
             return
         self.move.emit()
-        self.endPoint = self.toMapCoordinates( e.pos() )
+        self.endPoint = self.toMapCoordinates(e.pos())
         self.showRect(self.startPoint, self.endPoint)
 
     def showRect(self, startPoint, endPoint):
-        self.rb.reset(QgsWkbTypes.PolygonGeometry)	# true, it's a polygon
+        self.rb.reset(QgsWkbTypes.PolygonGeometry)  # true, it's a polygon
         if startPoint.x() == endPoint.x() or startPoint.y() == endPoint.y():
             return
 
@@ -83,18 +96,20 @@ class drawRect(QgsMapTool):
         point3 = QgsPointXY(endPoint.x(), endPoint.y())
         point4 = QgsPointXY(endPoint.x(), startPoint.y())
 
-        self.rb.addPoint( point1, False )
-        self.rb.addPoint( point2, False )
-        self.rb.addPoint( point3, False )
-        self.rb.addPoint( point4, True  )	# true to update canvas
+        self.rb.addPoint(point1, False)
+        self.rb.addPoint(point2, False)
+        self.rb.addPoint(point3, False)
+        self.rb.addPoint(point4, True)  # true to update canvas
         self.rb.show()
 
     def deactivate(self):
-      self.rb.reset( True )
-      QgsMapTool.deactivate(self)
+        self.rb.reset(True)
+        QgsMapTool.deactivate(self)
+
 
 class RectangleDialog(QDialog):
     crs = None
+
     def __init__(self):
         QDialog.__init__(self)
 
@@ -109,17 +124,18 @@ class RectangleDialog(QDialog):
         self.width.setValidator(width_val)
         self.height.setValidator(height_val)
 
-        buttons =   QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, Qt.Horizontal, self)
+        buttons = QDialogButtonBox(
+            QDialogButtonBox.Ok | QDialogButtonBox.Cancel, Qt.Horizontal, self)
         buttons.accepted.connect(self.accept)
         buttons.rejected.connect(self.reject)
 
         grid = QGridLayout()
-        grid.addWidget(QLabel(tr('Give a size in m:')),0,0)
-        grid.addWidget(QLabel(tr('Width:')),1,0)
-        grid.addWidget(QLabel(tr('Height:')),1,1)
-        grid.addWidget(self.width,2,0)
-        grid.addWidget(self.height,2,1)
-        grid.addWidget(buttons,3,0,1,2)
+        grid.addWidget(QLabel(tr('Give a size in m:')), 0, 0)
+        grid.addWidget(QLabel(tr('Width:')), 1, 0)
+        grid.addWidget(QLabel(tr('Height:')), 1, 1)
+        grid.addWidget(self.width, 2, 0)
+        grid.addWidget(self.height, 2, 1)
+        grid.addWidget(buttons, 3, 0, 1, 2)
 
         self.setLayout(grid)
 
@@ -132,7 +148,8 @@ class RectangleDialog(QDialog):
         if dialog.width.text().strip() and dialog.height.text().strip():
             width = float(dialog.width.text())
             height = float(dialog.height.text())
-        return (width,height, result == QDialog.Accepted)
+        return (width, height, result == QDialog.Accepted)
+
 
 class drawPolygon(QgsMapTool):
   '''Outil de sélection par polygone, tiré de selectPlusFr'''
@@ -289,30 +306,30 @@ class drawLine(QgsMapTool):
     self.rb.reset( QgsWkbTypes.LineGeometry )
     QgsMapTool.deactivate(self)
 
+
 class drawPoint(QgsMapTool):
-  def __init__(self,iface, couleur):
-      canvas = iface.mapCanvas()
-      QgsMapTool.__init__(self,canvas)
-      self.canvas = canvas
-      self.iface = iface
-      self.rb=QgsRubberBand(self.canvas, QgsWkbTypes.PointGeometry)
-      self.rb.setColor( couleur )
-      self.rb.setWidth(3)
-      self.selectionDone = pyqtSignal()
-      return None
+    def __init__(self, iface, couleur):
+        canvas = iface.mapCanvas()
+        QgsMapTool.__init__(self, canvas)
+        self.canvas = canvas
+        self.iface = iface
+        self.rb = QgsRubberBand(self.canvas, QgsWkbTypes.PointGeometry)
+        self.rb.setColor(couleur)
+        self.rb.setWidth(3)
+        self.selectionDone = pyqtSignal()
 
-  def canvasReleaseEvent(self,e):
-      if e.button() == Qt.LeftButton:
-         self.rb.addPoint(self.toMapCoordinates(e.pos()))
-         self.selectionDone.emit()
-      return None
+    def canvasReleaseEvent(self, e):
+        if e.button() == Qt.LeftButton:
+            self.rb.addPoint(self.toMapCoordinates(e.pos()))
+            self.selectionDone.emit()
 
-  def reset(self):
-      self.rb.reset( QgsWkbTypes.PointGeometry )
+    def reset(self):
+        self.rb.reset(QgsWkbTypes.PointGeometry)
 
-  def deactivate(self):
-    self.rb.reset( QgsWkbTypes.PointGeometry )
-    QgsMapTool.deactivate(self)
+    def deactivate(self):
+        self.rb.reset(QgsWkbTypes.PointGeometry)
+        QgsMapTool.deactivate(self)
+
 
 class selectPoint(QgsMapTool):
   def __init__(self,iface, couleur):
