@@ -25,6 +25,8 @@ from qgis.PyQt.QtCore import QTranslator, QSettings
 from qgis.PyQt.QtWidgets import QAction, QMessageBox, QMenu
 from qgis.PyQt.QtGui import QIcon
 
+from .drawtools import DrawPoint
+
 from qgis.core import *
 
 from .drawtools import *
@@ -184,7 +186,7 @@ class Qdraw(object):
     def drawPoint(self):
         if self.tool:
             self.tool.reset()
-        self.tool = drawPoint(self.iface, self.settings.getColor())
+        self.tool = DrawPoint(self.iface, self.settings.getColor())
         self.tool.setAction(self.actions[0])
         self.tool.selectionDone.connect(self.draw)
         self.iface.mapCanvas().setMapTool(self.tool)
@@ -400,8 +402,7 @@ class Qdraw(object):
         errBuffer_noAtt = False
         errBuffer_Vertices = False
 
-        legende = self.iface.legendInterface()
-        layer = legende.currentLayer()
+        layer = self.iface.activeLayer()
 
         if self.toolname == 'drawBuffer':
             if self.bGeom is None:

@@ -45,6 +45,7 @@ class drawRect(QgsMapTool):
         self.iface = iface
         self.rb = QgsRubberBand(self.canvas, QgsWkbTypes.PolygonGeometry)
         self.rb.setColor(couleur)
+        self.selectionDone = pyqtSignal()
         self.reset()
         return None
 
@@ -307,7 +308,7 @@ class drawLine(QgsMapTool):
     QgsMapTool.deactivate(self)
 
 
-class drawPoint(QgsMapTool):
+class DrawPoint(QgsMapTool):
     def __init__(self, iface, couleur):
         canvas = iface.mapCanvas()
         QgsMapTool.__init__(self, canvas)
