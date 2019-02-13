@@ -25,7 +25,7 @@ from builtins import range
 from qgis.core import *
 from qgis.gui import *
 from math import *
-from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtCore import Qt, QCoreApplication
 from qgis.PyQt.QtWidgets import QDialog, QLineEdit, QDialogButtonBox, QGridLayout, QLabel, QGroupBox, QVBoxLayout
 from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence
 
@@ -61,8 +61,8 @@ class drawRect(QgsMapTool):
         else:
             width, height, ok = RectangleDialog().getSize()
         if width > 0 and height > 0 and ok:
-            self.rb.addPoint(QgsPoint(self.startPoint.x()+width, self.startPoint.y()-height))
-            self.showRect(self.startPoint, QgsPoint(self.startPoint.x()+width, self.startPoint.y()-height))
+            self.rb.addPoint(QgsPointXY(self.startPoint.x()+width, self.startPoint.y()-height))
+            self.showRect(self.startPoint, QgsPointXY(self.startPoint.x()+width, self.startPoint.y()-height))
             self.selectionDone.emit()
         return None
 
@@ -78,10 +78,10 @@ class drawRect(QgsMapTool):
         if startPoint.x() == endPoint.x() or startPoint.y() == endPoint.y():
             return
 
-        point1 = QgsPoint(startPoint.x(), startPoint.y())
-        point2 = QgsPoint(startPoint.x(), endPoint.y())
-        point3 = QgsPoint(endPoint.x(), endPoint.y())
-        point4 = QgsPoint(endPoint.x(), startPoint.y())
+        point1 = QgsPointXY(startPoint.x(), startPoint.y())
+        point2 = QgsPointXY(startPoint.x(), endPoint.y())
+        point3 = QgsPointXY(endPoint.x(), endPoint.y())
+        point4 = QgsPointXY(endPoint.x(), startPoint.y())
 
         self.rb.addPoint( point1, False )
         self.rb.addPoint( point2, False )
@@ -241,7 +241,7 @@ def rbcircle(rb,center,edgePoint,N):
     rb.reset( QgsWkbTypes.PolygonGeometry )
     for itheta in range(N+1):
         theta = itheta*(2.0 * pi/N)
-        rb.addPoint(QgsPoint(center.x()+r*cos(theta),center.y()+r*sin(theta)))
+        rb.addPoint(QgsPointXY(center.x()+r*cos(theta),center.y()+r*sin(theta)))
     return
 
 class drawLine(QgsMapTool):
@@ -453,7 +453,7 @@ class DMSDialog(QDialog):
             longitude = int(dialog.lon_D.text())+ float(dialog.lon_M.text())/60 + float(dialog.lon_S.text())/3600
             if dialog.lon_EW.currentIndex() == 1:
                 longitude *= -1
-        return (QgsPoint(longitude, latitude), result == QDialog.Accepted)
+        return (QgsPointXY(longitude, latitude), result == QDialog.Accepted)
 
     def lat_MS_edited(self):
         if self.lat_M.text().strip():
@@ -555,4 +555,4 @@ class XYDialog(QDialog):
         if dialog.X.text().strip() and dialog.Y.text().strip():
             X = float(dialog.X.text())
             Y = float(dialog.Y.text())
-        return ([QgsPoint(X, Y), dialog.crs], result == QDialog.Accepted)
+        return ([QgsPointXY(X, Y), dialog.crs], result == QDialog.Accepted)

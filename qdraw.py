@@ -85,7 +85,7 @@ class Qdraw(object):
         add_to_toolbar=True,
         status_tip=None,
         whats_this=None,
-	menu=None,
+	    menu=None,
         parent=None):
 
         icon = QIcon(icon_path)
@@ -240,8 +240,10 @@ class Qdraw(object):
             self.tool.reset()
         self.tool = drawRect(self.iface, self.settings.getColor())
         self.tool.setAction(self.actions[2])
-        self.iface.connect(self.tool, SIGNAL("selectionDone()"), self.draw)
-        self.iface.connect(self.tool, SIGNAL("move()"), self.updateSB)
+        self.actions[2].triggered.connect(self.draw)
+        self.actions[2].triggered.connect(self.updateSB)
+        #self.iface.connect(self.tool, SIGNAL("selectionDone()"), self.draw)
+        #self.iface.connect(self.tool, SIGNAL("move()"), self.updateSB)
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'polygon'
         self.toolname = 'drawRect'
