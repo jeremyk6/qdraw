@@ -25,7 +25,7 @@ from builtins import range
 from qgis.core import *
 from qgis.gui import *
 from math import *
-from qgis.PyQt.QtCore import Qt, QCoreApplication
+from qgis.PyQt.QtCore import Qt, QCoreApplication, pyqtSignal
 from qgis.PyQt.QtWidgets import QDialog, QLineEdit, QDialogButtonBox, QGridLayout, QLabel, QGroupBox, QVBoxLayout
 from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence
 
@@ -298,6 +298,7 @@ class drawPoint(QgsMapTool):
       self.rb=QgsRubberBand(self.canvas, QgsWkbTypes.PointGeometry)
       self.rb.setColor( couleur )
       self.rb.setWidth(3)
+      self.selectionDone = pyqtSignal()
       return None
 
   def canvasReleaseEvent(self,e):
