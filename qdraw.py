@@ -25,11 +25,12 @@ from qgis.PyQt.QtCore import QTranslator, QSettings
 from qgis.PyQt.QtWidgets import QAction, QMessageBox, QMenu
 from qgis.PyQt.QtGui import QIcon
 
-from .drawtools import DrawPoint
+from qgis.core import QgsFeature
+
+from .drawtools import DrawPoint, DrawRect, DrawLine, DrawCircle, DrawPolygon,\
+    SelectPoint
 
 from qgis.core import *
-
-from .drawtools import *
 from .qdrawsettings import *
 from .qdrawlayerdialog import *
 
@@ -228,7 +229,7 @@ class Qdraw(object):
     def drawLine(self):
         if self.tool:
             self.tool.reset()
-        self.tool = drawLine(self.iface, self.settings.getColor())
+        self.tool = DrawLine(self.iface, self.settings.getColor())
         self.tool.setAction(self.actions[1])
         self.tool.selectionDone.connect(self.draw)
         self.tool.move.connect(self.updateSB)
@@ -240,7 +241,7 @@ class Qdraw(object):
     def drawRect(self):
         if self.tool:
             self.tool.reset()
-        self.tool = drawRect(self.iface, self.settings.getColor())
+        self.tool = DrawRect(self.iface, self.settings.getColor())
         self.tool.setAction(self.actions[2])
         self.tool.selectionDone.connect(self.draw)
         self.tool.move.connect(self.updateSB)
@@ -252,7 +253,7 @@ class Qdraw(object):
     def drawCircle(self):
         if self.tool:
             self.tool.reset()
-        self.tool = drawCircle(self.iface, self.settings.getColor(), 40)
+        self.tool = DrawCircle(self.iface, self.settings.getColor(), 40)
         self.tool.setAction(self.actions[3])
         self.tool.selectionDone.connect(self.draw)
         self.tool.move.connect(self.updateSB)
@@ -264,7 +265,7 @@ class Qdraw(object):
     def drawPolygon(self):
         if self.tool:
             self.tool.reset()
-        self.tool = drawPolygon(self.iface, self.settings.getColor())
+        self.tool = DrawPolygon(self.iface, self.settings.getColor())
         self.tool.setAction(self.actions[4])
         self.tool.selectionDone.connect(self.draw)
         self.tool.move.connect(self.updateSB)
@@ -277,7 +278,7 @@ class Qdraw(object):
         self.bGeom = None
         if self.tool:
             self.tool.reset()
-        self.tool = selectPoint(self.iface, self.settings.getColor())
+        self.tool = SelectPoint(self.iface, self.settings.getColor())
         self.actions[5].setIcon(QIcon(':/plugins/Qgeric/resources/icon_DrawT.png'))
         self.actions[5].setText(self.tr('Buffer drawing tool on the selected layer'))
         self.actions[5].triggered.disconnect()
@@ -298,7 +299,7 @@ class Qdraw(object):
         self.bGeom = None
         if self.tool:
             self.tool.reset()
-        self.tool = drawPolygon(self.iface, self.settings.getColor())
+        self.tool = DrawPolygon(self.iface, self.settings.getColor())
         self.actions[5].setIcon(QIcon(':/plugins/Qgeric/resources/icon_DrawTP.png'))
         self.actions[5].setText(self.tr('Polygon buffer drawing tool on the selected layer'))
         self.actions[5].triggered.disconnect()
@@ -338,7 +339,7 @@ class Qdraw(object):
             self.sb.showMessage(self.tr('Select a vector layer in the Layer Tree, then select an entity on the map.'))
 
     def updateSB(self):
-        g = self.geomTransform(self.tool.rb.asGeometry(), self.iface.mapCanvas().mapRenderer().destinationCrs(), QgsCoordinateReferenceSystem(2154))
+        g = self.geomTransform(self.tool.rb.asGeometry(), self.iface.mapCanvas().mapSettings().destinationCrs(), QgsCoordinateReferenceSystem(2154))
         if self.toolname == 'drawLine':
             if g.length() >= 0:
                 self.sb.showMessage(self.tr('Length')+': '+str("%.2f"%g.length())+" m")
@@ -353,7 +354,7 @@ class Qdraw(object):
 
     def geomTransform(self, geom, crs_orig, crs_dest):
         g = QgsGeometry(geom)
-        crsTransform = QgsCoordinateTransform(crs_orig, crs_dest)
+        crsTransform = QgsCoordinateTransform(crs_orig, crs_dest, QgsCoordinateTransformContext()) # todo quel contexte ?
         g.transform(crsTransform)
         return g
 
@@ -383,7 +384,7 @@ class Qdraw(object):
             if len(rbGeom) > 0:
                 for geometry in rbGeom:
                     if rbGeom[0].combine(geometry) is not None:
-                        if self.bGeom == None:
+                        if self.bGeom is None:
                             self.bGeom = geometry
                         else:
                             self.bGeom = self.bGeom.combine(geometry)
@@ -446,9 +447,9 @@ class Qdraw(object):
                     # fix_print_with_import
                     print("LineString?crs="+self.iface.mapCanvas().mapRenderer().destinationCrs().authid()+"&field="+self.tr('Drawings')+":string(255)")
                 else:
-                    layer = QgsVectorLayer("Polygon?crs="+self.iface.mapCanvas().mapRenderer().destinationCrs().authid()+"&field="+self.tr('Drawings')+":string(255)",name,"memory")
+                    layer = QgsVectorLayer("Polygon?crs="+self.iface.mapCanvas().mapSettings().destinationCrs().authid()+"&field="+self.tr('Drawings')+":string(255)",name,"memory")
             layer.startEditing()
-            symbols = layer.rendererV2().symbols()
+            symbols = layer.renderer().symbols(QgsRenderContext()) # todo quel contexte ? QgsRenderContext
             symbols[0].setColor(self.settings.getColor())
             feature = QgsFeature()
             feature.setGeometry(g)
@@ -456,7 +457,7 @@ class Qdraw(object):
             layer.dataProvider().addFeatures([feature])
             layer.commitChanges()
             if not add:
-                QgsMapLayerRegistry.instance().addMapLayer(layer, False)
+                QgsProject.instance().addMapLayer(layer, False)
                 if QgsProject.instance().layerTreeRoot().findGroup(self.tr('Drawings')) == None:
                     QgsProject.instance().layerTreeRoot().insertChildNode(0,QgsLayerTreeGroup(self.tr('Drawings')))
                 group = QgsProject.instance().layerTreeRoot().findGroup(self.tr('Drawings'))

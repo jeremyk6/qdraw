@@ -36,7 +36,7 @@ from qgis.PyQt.QtWidgets import QDialog, QLineEdit, QDialogButtonBox, \
 from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence
 
 
-class drawRect(QgsMapTool):
+class DrawRect(QgsMapTool):
     '''Classe de sélection avec un Rectangle'''
 
     selectionDone = pyqtSignal()
@@ -153,8 +153,11 @@ class RectangleDialog(QDialog):
         return (width, height, result == QDialog.Accepted)
 
 
-class drawPolygon(QgsMapTool):
+class DrawPolygon(QgsMapTool):
     '''Outil de sélection par polygone, tiré de selectPlusFr'''
+
+    selectionDone = pyqtSignal()
+    move = pyqtSignal()
 
     def __init__(self, iface, couleur):
         canvas = iface.mapCanvas()
@@ -201,8 +204,12 @@ class drawPolygon(QgsMapTool):
         QgsMapTool.deactivate(self)
 
 
-class drawCircle(QgsMapTool):
+class DrawCircle(QgsMapTool):
   '''Outil de sélection par cercle, tiré de selectPlusFr'''
+
+  selectionDone = pyqtSignal()
+  move = pyqtSignal()
+
   def __init__(self,iface, color, segments):
       canvas = iface.mapCanvas()
       QgsMapTool.__init__(self,canvas)
@@ -265,7 +272,10 @@ def rbcircle(rb,center,edgePoint,N):
         rb.addPoint(QgsPointXY(center.x()+r*cos(theta),center.y()+r*sin(theta)))
     return
 
-class drawLine(QgsMapTool):
+class DrawLine(QgsMapTool):
+  selectionDone = pyqtSignal()
+  move = pyqtSignal()
+
   def __init__(self,iface, couleur):
       canvas = iface.mapCanvas()
       QgsMapTool.__init__(self,canvas)
@@ -312,6 +322,8 @@ class drawLine(QgsMapTool):
 
 
 class DrawPoint(QgsMapTool):
+    selectionDone = pyqtSignal()
+
     def __init__(self, iface, couleur):
         canvas = iface.mapCanvas()
         QgsMapTool.__init__(self, canvas)
@@ -320,7 +332,6 @@ class DrawPoint(QgsMapTool):
         self.rb = QgsRubberBand(self.canvas, QgsWkbTypes.PointGeometry)
         self.rb.setColor(couleur)
         self.rb.setWidth(3)
-        self.selectionDone = pyqtSignal()
 
     def canvasReleaseEvent(self, e):
         if e.button() == Qt.LeftButton:
@@ -335,7 +346,10 @@ class DrawPoint(QgsMapTool):
         QgsMapTool.deactivate(self)
 
 
-class selectPoint(QgsMapTool):
+class SelectPoint(QgsMapTool):
+  select = pyqtSignal()
+  selectionDone = pyqtSignal()
+
   def __init__(self,iface, couleur):
       canvas = iface.mapCanvas()
       QgsMapTool.__init__(self,canvas)
