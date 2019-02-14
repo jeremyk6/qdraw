@@ -32,12 +32,15 @@ from math import *
 
 from qgis.PyQt.QtCore import Qt, QCoreApplication, pyqtSignal
 from qgis.PyQt.QtWidgets import QDialog, QLineEdit, QDialogButtonBox, \
-    QGridLayout, QLabel, QGroupBox, QVBoxLayout, QComboBox
+    QGridLayout, QLabel, QGroupBox, QVBoxLayout, QComboBox, QPushButton
 from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence
 
 
 class drawRect(QgsMapTool):
     '''Classe de sélection avec un Rectangle'''
+
+    selectionDone = pyqtSignal()
+    move = pyqtSignal()
 
     def __init__(self, iface, couleur):
         self.canvas = iface.mapCanvas()
@@ -45,7 +48,6 @@ class drawRect(QgsMapTool):
         self.iface = iface
         self.rb = QgsRubberBand(self.canvas, QgsWkbTypes.PolygonGeometry)
         self.rb.setColor(couleur)
-        self.selectionDone = pyqtSignal()
         self.reset()
         return None
 
@@ -345,7 +347,7 @@ class selectPoint(QgsMapTool):
 
   def canvasReleaseEvent(self,e):
       if e.button() == Qt.LeftButton:
-         self.rbSelect.reset( QgsWkbTypes.PolygonGeometry )
+         self.rbSelect.reset(QgsWkbTypes.PolygonGeometry)
          cp = self.toMapCoordinates(QPoint(e.pos().x()-5, e.pos().y()-5))
          self.rbSelect.addPoint(cp)
          cp = self.toMapCoordinates(QPoint(e.pos().x()+5, e.pos().y()-5))
@@ -360,12 +362,12 @@ class selectPoint(QgsMapTool):
       return None
 
   def reset(self):
-      self.rb.reset( QgsWkbTypes.PolygonGeometry )
-      self.rbSelect.reset( QgsWkbTypes.PolygonGeometry )
+      self.rb.reset(QgsWkbTypes.PolygonGeometry)
+      self.rbSelect.reset(QgsWkbTypes.PolygonGeometry)
 
   def deactivate(self):
-    self.rb.reset( QgsWkbTypes.PolygonGeometry )
-    self.rbSelect.reset( QgsWkbTypes.PolygonGeometry )
+    self.rb.reset(QgsWkbTypes.PolygonGeometry)
+    self.rbSelect.reset( QgsWkbTypes.PolygonGeometry)
     QgsMapTool.deactivate(self)
 
 def tr(message):
@@ -417,7 +419,8 @@ class DMSDialog(QDialog):
         self.lon_EW.addItem("E")
         self.lon_EW.addItem("W")
 
-        buttons =   QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, Qt.Horizontal, self)
+        buttons = QDialogButtonBox(
+            QDialogButtonBox.Ok | QDialogButtonBox.Cancel, Qt.Horizontal, self)
         buttons.accepted.connect(self.accept)
         buttons.rejected.connect(self.reject)
 
@@ -540,18 +543,18 @@ class XYDialog(QDialog):
         self.crsButton.clicked.connect(self.changeCRS)
         self.crsLabel = QLabel("")
 
-        buttons =   QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, Qt.Horizontal, self)
+        buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, Qt.Horizontal, self)
         buttons.accepted.connect(self.accept)
         buttons.rejected.connect(self.reject)
 
         grid = QGridLayout()
-        grid.addWidget(QLabel("X"),0,0)
-        grid.addWidget(QLabel("Y"),0,1)
-        grid.addWidget(self.X,1,0)
-        grid.addWidget(self.Y,1,1)
-        grid.addWidget(self.crsButton, 2,0)
+        grid.addWidget(QLabel("X"), 0, 0)
+        grid.addWidget(QLabel("Y"), 0, 1)
+        grid.addWidget(self.X, 1, 0)
+        grid.addWidget(self.Y, 1, 1)
+        grid.addWidget(self.crsButton, 2, 0)
         grid.addWidget(self.crsLabel, 2, 1)
-        grid.addWidget(buttons,3,0,1,2)
+        grid.addWidget(buttons, 3, 0, 1, 2)
 
         self.setLayout(grid)
 

@@ -19,6 +19,7 @@
 
 from qgis.PyQt.QtCore import QCoreApplication
 from qgis.PyQt.QtWidgets import QDialog, QComboBox, QLineEdit, QVBoxLayout
+from qgis.core import QgsProject
 
 class QDrawLayerDialog(QDialog):
     def __init__(self, iface, gtype):
@@ -38,8 +39,9 @@ class QDrawLayerDialog(QDialog):
         #change here by QgsMapLayerComboBox()
         self.layerBox = QComboBox()
         self.layers = []
-        for layer in iface.legendInterface().layers():
-            if "memory" in layer.dataProvider().dataSourceUri()[:6]: # must be a memory layer
+        for layer in QgsProject.instance().mapLayers().values():
+            if layer.providerType() == "memory":
+                # ligne suivante à remplacer par if layer.geometryType() == :
                 if gtype in layer.dataProvider().dataSourceUri()[:26]: # must be of the same type of the draw
                     if 'field='+self.tr('Drawings')+':string(255,0)' in layer.dataProvider().dataSourceUri()[-28:]: # must have its first field named Drawings, string type
                         self.layers.append(layer)
