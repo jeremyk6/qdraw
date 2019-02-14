@@ -71,16 +71,15 @@ class drawRect(QgsMapTool):
             self.selectionDone.emit()
         else:
             width, height, ok = RectangleDialog().getSize()
-        if width > 0 and height > 0 and ok:
-            self.rb.addPoint(
-                QgsPointXY(
-                    self.startPoint.x()+width, self.startPoint.y()-height))
-            self.showRect(
-                self.startPoint,
-                QgsPointXY(
-                    self.startPoint.x()+width, self.startPoint.y()-height))
-            self.selectionDone.emit()
-        return None
+            if width > 0 and height > 0 and ok:
+                self.rb.addPoint(
+                    QgsPointXY(
+                        self.startPoint.x()+width, self.startPoint.y()-height))
+                self.showRect(
+                    self.startPoint,
+                    QgsPointXY(
+                        self.startPoint.x()+width, self.startPoint.y()-height))
+                self.selectionDone.emit()
 
     def canvasMoveEvent(self, e):
         if not self.isEmittingPoint:
