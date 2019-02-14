@@ -155,50 +155,52 @@ class RectangleDialog(QDialog):
 
 
 class drawPolygon(QgsMapTool):
-  '''Outil de sélection par polygone, tiré de selectPlusFr'''
-  def __init__(self,iface, couleur):
-      canvas = iface.mapCanvas()
-      QgsMapTool.__init__(self,canvas)
-      self.canvas = canvas
-      self.iface = iface
-      self.status = 0
-      self.rb=QgsRubberBand(self.canvas,QgsWkbTypes.PolygonGeometry)
-      self.rb.setColor( couleur )
-      return None
+    '''Outil de sélection par polygone, tiré de selectPlusFr'''
 
-  def keyPressEvent(self, e):
-      if e.matches(QKeySequence.Undo):
-         if self.rb.numberOfVertices() > 1:
-           self.rb.removeLastPoint()
+    def __init__(self, iface, couleur):
+        canvas = iface.mapCanvas()
+        QgsMapTool.__init__(self, canvas)
+        self.canvas = canvas
+        self.iface = iface
+        self.status = 0
+        self.rb = QgsRubberBand(self.canvas,QgsWkbTypes.PolygonGeometry)
+        self.rb.setColor(couleur)
+        return None
 
-  def canvasPressEvent(self,e):
-      if e.button() == Qt.LeftButton:
-         if self.status == 0:
-           self.rb.reset( QgsWkbTypes.PolygonGeometry )
-           self.status = 1
-         self.rb.addPoint(self.toMapCoordinates(e.pos()))
-      else:
-         if self.rb.numberOfVertices() > 2:
-           self.status = 0
-           self.selectionDone.emit()
-         else:
-           self.reset()
-      return None
+    def keyPressEvent(self, e):
+        if e.matches(QKeySequence.Undo):
+            if self.rb.numberOfVertices() > 1:
+                self.rb.removeLastPoint()
 
-  def canvasMoveEvent(self,e):
-      if self.rb.numberOfVertices() > 0 and self.status == 1:
-          self.rb.removeLastPoint(0)
-          self.rb.addPoint(self.toMapCoordinates(e.pos()))
-      self.move.emit()
-      return None
+    def canvasPressEvent(self, e):
+        if e.button() == Qt.LeftButton:
+            if self.status == 0:
+                self.rb.reset(QgsWkbTypes.PolygonGeometry)
+                self.status = 1
+            self.rb.addPoint(self.toMapCoordinates(e.pos()))
+        else:
+            if self.rb.numberOfVertices() > 2:
+                self.status = 0
+                self.selectionDone.emit()
+            else:
+                self.reset()
+        return None
 
-  def reset(self):
-      self.status = 0
-      self.rb.reset( True )
+    def canvasMoveEvent(self, e):
+        if self.rb.numberOfVertices() > 0 and self.status == 1:
+            self.rb.removeLastPoint(0)
+            self.rb.addPoint(self.toMapCoordinates(e.pos()))
+        self.move.emit()
+        return None
 
-  def deactivate(self):
-    self.rb.reset( True )
-    QgsMapTool.deactivate(self)
+    def reset(self):
+        self.status = 0
+        self.rb.reset(True)
+
+    def deactivate(self):
+        self.rb.reset(True)
+        QgsMapTool.deactivate(self)
+
 
 class drawCircle(QgsMapTool):
   '''Outil de sélection par cercle, tiré de selectPlusFr'''
