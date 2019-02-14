@@ -25,14 +25,12 @@ from builtins import range
 
 from qgis.gui import QgsMapTool, QgsRubberBand, QgsMapToolEmitPoint
 from qgis.core import QgsWkbTypes, QgsPointXY
-
-from qgis.core import *
-from qgis.gui import *
-from math import *
+from math import sqrt, pi, cos, sin
 
 from qgis.PyQt.QtCore import Qt, QCoreApplication, pyqtSignal, QPoint
 from qgis.PyQt.QtWidgets import QDialog, QLineEdit, QDialogButtonBox, \
-    QGridLayout, QLabel, QGroupBox, QVBoxLayout, QComboBox, QPushButton
+    QGridLayout, QLabel, QGroupBox, QVBoxLayout, QComboBox, QPushButton, \
+    QInputDialog
 from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence
 
 
@@ -74,11 +72,13 @@ class DrawRect(QgsMapTool):
             if width > 0 and height > 0 and ok:
                 self.rb.addPoint(
                     QgsPointXY(
-                        self.startPoint.x() + width, self.startPoint.y() - height))
+                        self.startPoint.x() + width,
+                        self.startPoint.y() - height))
                 self.showRect(
                     self.startPoint,
                     QgsPointXY(
-                        self.startPoint.x() + width, self.startPoint.y() - height))
+                        self.startPoint.x() + width,
+                        self.startPoint.y() - height))
                 self.selectionDone.emit()
 
     def canvasMoveEvent(self, e):
@@ -246,8 +246,9 @@ class DrawCircle(QgsMapTool):
         if self.rb.numberOfVertices() > 3:
             self.selectionDone.emit()
         else:
-            radius, ok = QInputDialog.getDouble(self.iface.mainWindow(), tr(
-                'Radius'), tr('Give a radius in m:'), min=0)
+            radius, ok = QInputDialog.getDouble(
+                self.iface.mainWindow(), tr('Radius'),
+                tr('Give a radius in m:'), min=0)
             if radius > 0 and ok:
                 cp = self.toMapCoordinates(e.pos())
                 cp.setX(cp.x() + radius)
@@ -495,14 +496,20 @@ class DMSDialog(QDialog):
 
         latitude = 0
         longitude = 0
-        if (dialog.lat_D.text().strip() and dialog.lat_M.text().strip() and dialog.lat_S.text().strip()
-                and dialog.lon_D.text().strip() and dialog.lon_M.text().strip() and dialog.lon_S.text().strip()):
-            latitude = int(dialog.lat_D.text()) + float(dialog.lat_M.text()
-                                                        ) / 60 + float(dialog.lat_S.text()) / 3600
+        if dialog.lat_D.text().strip() \
+                and dialog.lat_M.text().strip() \
+                and dialog.lat_S.text().strip() \
+                and dialog.lon_D.text().strip() \
+                and dialog.lon_M.text().strip() \
+                and dialog.lon_S.text().strip():
+            latitude = int(dialog.lat_D.text()) \
+                + float(dialog.lat_M.text()) / 60 \
+                + float(dialog.lat_S.text()) / 3600
             if dialog.lat_NS.currentIndex() == 1:
                 latitude *= -1
-            longitude = int(dialog.lon_D.text(
-            )) + float(dialog.lon_M.text()) / 60 + float(dialog.lon_S.text()) / 3600
+            longitude = int(dialog.lon_D.text()) \
+                + float(dialog.lon_M.text()) / 60 \
+                + float(dialog.lon_S.text()) / 3600
             if dialog.lon_EW.currentIndex() == 1:
                 longitude *= -1
         return (QgsPointXY(longitude, latitude), result == QDialog.Accepted)
