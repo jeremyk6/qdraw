@@ -230,8 +230,8 @@ class Qdraw(object):
             self.tool.reset()
         self.tool = drawLine(self.iface, self.settings.getColor())
         self.tool.setAction(self.actions[1])
-        self.iface.connect(self.tool, SIGNAL("selectionDone()"), self.draw)
-        self.iface.connect(self.tool, SIGNAL("move()"), self.updateSB)
+        self.tool.selectionDone.connect(self.draw)
+        self.tool.move.connect(self.updateSB)
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'line'
         self.toolname = 'drawLine'
@@ -242,10 +242,8 @@ class Qdraw(object):
             self.tool.reset()
         self.tool = drawRect(self.iface, self.settings.getColor())
         self.tool.setAction(self.actions[2])
-        self.actions[2].triggered.connect(self.draw)
-        self.actions[2].triggered.connect(self.updateSB)
-        #self.iface.connect(self.tool, SIGNAL("selectionDone()"), self.draw)
-        #self.iface.connect(self.tool, SIGNAL("move()"), self.updateSB)
+        self.tool.selectionDone.connect(self.draw)
+        self.tool.move.connect(self.updateSB)
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'polygon'
         self.toolname = 'drawRect'
@@ -256,8 +254,8 @@ class Qdraw(object):
             self.tool.reset()
         self.tool = drawCircle(self.iface, self.settings.getColor(), 40)
         self.tool.setAction(self.actions[3])
-        self.iface.connect(self.tool, SIGNAL("selectionDone()"), self.draw)
-        self.iface.connect(self.tool, SIGNAL("move()"), self.updateSB)
+        self.tool.selectionDone.connect(self.draw)
+        self.tool.move.connect(self.updateSB)
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'polygon'
         self.toolname = 'drawCircle'
@@ -268,8 +266,8 @@ class Qdraw(object):
             self.tool.reset()
         self.tool = drawPolygon(self.iface, self.settings.getColor())
         self.tool.setAction(self.actions[4])
-        self.iface.connect(self.tool, SIGNAL("selectionDone()"), self.draw)
-        self.iface.connect(self.tool, SIGNAL("move()"), self.updateSB)
+        self.tool.selectionDone.connect(self.draw)
+        self.tool.move.connect(self.updateSB)
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'polygon'
         self.toolname = 'drawPolygon'
@@ -289,8 +287,8 @@ class Qdraw(object):
         self.actions[5].menu().actions()[0].triggered.disconnect()
         self.actions[5].menu().actions()[0].triggered.connect(self.drawPolygonBuffer)
         self.tool.setAction(self.actions[5])
-        self.iface.connect(self.tool, SIGNAL("select()"), self.selectBuffer)
-        self.iface.connect(self.tool, SIGNAL("selectionDone()"), self.draw)
+        self.tool.select.connect(self.selectBuffer)
+        self.tool.selectionDone.connect(self.draw)
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'polygon'
         self.toolname = 'drawBuffer'
@@ -310,14 +308,14 @@ class Qdraw(object):
         self.actions[5].menu().actions()[0].triggered.disconnect()
         self.actions[5].menu().actions()[0].triggered.connect(self.drawBuffer)
         self.tool.setAction(self.actions[5])
-        self.iface.connect(self.tool, SIGNAL("selectionDone()"), self.selectBuffer)
+        self.tool.selectionDone.connect(self.selectBuffer)
         self.iface.mapCanvas().setMapTool(self.tool)
         self.drawShape = 'polygon'
         self.toolname = 'drawBuffer'
         self.resetSB()
 
     def showSettingsWindow(self):
-        self.iface.connect(self.settings, SIGNAL("settingsChanged()"), self.settingsChanged)
+        self.settings.settingsChanged.connect(self.settingsChanged)
         self.settings.show()
 
     # triggered when a setting is changed
