@@ -17,9 +17,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from qgis.PyQt.QtCore import QCoreApplication
-from qgis.PyQt.QtWidgets import QDialog, QComboBox, QLineEdit, QVBoxLayout
+from qgis.PyQt.QtCore import QCoreApplication, Qt
+from qgis.PyQt.QtWidgets import QDialog, QComboBox, QLineEdit, QVBoxLayout, \
+    QCheckBox, QDialogButtonBox, QLabel
 from qgis.core import QgsProject
+
 
 class QDrawLayerDialog(QDialog):
     def __init__(self, iface, gtype):
@@ -50,7 +52,7 @@ class QDrawLayerDialog(QDialog):
         self.addLayer = QCheckBox(self.tr('Add to an existing layer'))
         self.addLayer.toggled.connect(self.addLayerChecked)
 
-        buttons =   QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, Qt.Horizontal, self)
+        buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, Qt.Horizontal, self)
         buttons.accepted.connect(self.accept)
         buttons.rejected.connect(self.reject)
 
