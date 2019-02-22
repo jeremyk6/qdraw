@@ -23,15 +23,17 @@ from __future__ import print_function
 from builtins import str
 from builtins import range
 
-from qgis.gui import QgsMapTool, QgsRubberBand, QgsMapToolEmitPoint
+from qgis.gui import QgsMapTool, QgsRubberBand, QgsMapToolEmitPoint, \
+    QgsProjectionSelectionDialog
 from qgis.core import QgsWkbTypes, QgsPointXY
-from math import sqrt, pi, cos, sin
 
 from qgis.PyQt.QtCore import Qt, QCoreApplication, pyqtSignal, QPoint
 from qgis.PyQt.QtWidgets import QDialog, QLineEdit, QDialogButtonBox, \
     QGridLayout, QLabel, QGroupBox, QVBoxLayout, QComboBox, QPushButton, \
     QInputDialog
 from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence
+
+from math import sqrt, pi, cos, sin
 
 
 class DrawRect(QgsMapTool):
@@ -599,9 +601,9 @@ class XYDialog(QDialog):
         self.setLayout(grid)
 
     def changeCRS(self):
-        projSelector = QgsGenericProjectionSelector()
+        projSelector = QgsProjectionSelectionDialog()
         projSelector.exec_()
-        self.crs.createFromSrsId(projSelector.selectedCrsId())
+        self.crs = projSelector.crs()
         self.crsLabel.setText(self.crs.authid())
 
     def getPoint(self, crs):

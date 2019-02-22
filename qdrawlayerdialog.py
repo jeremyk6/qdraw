@@ -38,13 +38,13 @@ class QDrawLayerDialog(QDialog):
         else:
             gtype = 'Polygon'
 
-        #change here by QgsMapLayerComboBox()
+        # change here by QgsMapLayerComboBox()
         self.layerBox = QComboBox()
         self.layers = []
         for layer in QgsProject.instance().mapLayers().values():
             if layer.providerType() == "memory":
                 # ligne suivante à remplacer par if layer.geometryType() == :
-                if gtype in layer.dataProvider().dataSourceUri()[:26]: # must be of the same type of the draw
+                if gtype in layer.dataProvider().dataSourceUri()[:26]: #  must be of the same type of the draw
                     if 'field='+self.tr('Drawings')+':string(255,0)' in layer.dataProvider().dataSourceUri()[-28:]: # must have its first field named Drawings, string type
                         self.layers.append(layer)
                         self.layerBox.addItem(layer.name())
@@ -52,7 +52,8 @@ class QDrawLayerDialog(QDialog):
         self.addLayer = QCheckBox(self.tr('Add to an existing layer'))
         self.addLayer.toggled.connect(self.addLayerChecked)
 
-        buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, Qt.Horizontal, self)
+        buttons = QDialogButtonBox(
+            QDialogButtonBox.Ok | QDialogButtonBox.Cancel, Qt.Horizontal, self)
         buttons.accepted.connect(self.accept)
         buttons.rejected.connect(self.reject)
 
@@ -82,4 +83,9 @@ class QDrawLayerDialog(QDialog):
     def getName(self, iface, gtype):
         dialog = QDrawLayerDialog(iface, gtype)
         result = dialog.exec_()
-        return (dialog.name.text(), dialog.addLayer.checkState() == Qt.Checked, dialog.layerBox.currentIndex(), dialog.layers, result == QDialog.Accepted)
+        return (
+            dialog.name.text(),
+            dialog.addLayer.checkState() == Qt.Checked,
+            dialog.layerBox.currentIndex(),
+            dialog.layers,
+            result == QDialog.Accepted)

@@ -14,32 +14,36 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
-#You should have received a copy of the GNU General Public License
-#along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from builtins import str
-from qgis.PyQt.QtWidgets import QWidget, QPushButton, QSlider, QDesktopWidget, QLabel, QColorDialog, QVBoxLayout
+from qgis.PyQt.QtWidgets import QWidget, QPushButton, QSlider, QDesktopWidget,\
+    QLabel, QColorDialog, QVBoxLayout
 from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtCore import Qt, QCoreApplication
+from qgis.PyQt.QtCore import Qt, QCoreApplication, pyqtSignal
 
-# window used to change settings (transparency/color)
+
 class QdrawSettings(QWidget):
+    """Window used to change settings (transparency/color)"""
+    settingsChanged = pyqtSignal()
+
     def __init__(self):
         QWidget.__init__(self)
 
         self.setWindowTitle(self.tr('Qdraw - Settings'))
-        self.setFixedSize(320,100)
+        self.setFixedSize(320, 100)
         self.center()
 
         # default color
-        self.color = QColor(60,151,255, 255)
+        self.color = QColor(60, 151, 255, 255)
 
         self.sld_opacity = QSlider(Qt.Horizontal, self)
-        self.sld_opacity.setRange(0,255)
+        self.sld_opacity.setRange(0, 255)
         self.sld_opacity.setValue(255)
         self.sld_opacity.tracking = True
         self.sld_opacity.valueChanged.connect(self.handler_opacitySliderValue)
-        self.lbl_opacity = QLabel(self.tr('Opacity')+ ': 100%', self)
+        self.lbl_opacity = QLabel(self.tr('Opacity') + ': 100%', self)
 
         self.dlg_color = QColorDialog(self)
         btn_chColor = QPushButton(self.tr('Change the drawing color'), self)
@@ -56,7 +60,8 @@ class QdrawSettings(QWidget):
 
     def handler_opacitySliderValue(self, val):
         self.color.setAlpha(val)
-        self.lbl_opacity.setText(self.tr('Opacity')+': '+str(int((float(val)/255)*100))+'%')
+        self.lbl_opacity.setText(
+            self.tr('Opacity')+': '+str(int((float(val) / 255) * 100))+'%')
         self.settingsChanged.emit()
 
     def handler_chColor(self):
@@ -73,7 +78,8 @@ class QdrawSettings(QWidget):
     def center(self):
         screen = QDesktopWidget().screenGeometry()
         size = self.geometry()
-        self.move((screen.width()-size.width())/2, (screen.height()-size.height())/2)
+        self.move((screen.width() - size.width()) / 2,
+                  (screen.height() - size.height()) / 2)
 
     def closeEvent(self, e):
         self.clear()
