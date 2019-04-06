@@ -17,8 +17,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from qgis.PyQt.QtCore import QCoreApplication, Qt
+from qgis.PyQt.QtWidgets import QDialog, QComboBox, QLineEdit, QVBoxLayout, \
+    QCheckBox, QDialogButtonBox, QLabel
+from qgis.core import QgsProject
+
 
 class QDrawLayerDialog(QDialog):
     def __init__(self, iface, gtype):
@@ -35,11 +38,13 @@ class QDrawLayerDialog(QDialog):
         else:
             gtype = 'Polygon'
 
+        # change here by QgsMapLayerComboBox()
         self.layerBox = QComboBox()
         self.layers = []
-        for layer in iface.legendInterface().layers():
-            if "memory" in layer.dataProvider().dataSourceUri()[:6]: # must be a memory layer
-                if gtype in layer.dataProvider().dataSourceUri()[:26]: # must be of the same type of the draw
+        for layer in QgsProject.instance().mapLayers().values():
+            if layer.providerType() == "memory":
+                # ligne suivante à remplacer par if layer.geometryType() == :
+                if gtype in layer.dataProvider().dataSourceUri()[:26]: #  must be of the same type of the draw
                     if 'field='+self.tr('Drawings')+':string(255,0)' in layer.dataProvider().dataSourceUri()[-28:]: # must have its first field named Drawings, string type
                         self.layers.append(layer)
                         self.layerBox.addItem(layer.name())
@@ -47,7 +52,8 @@ class QDrawLayerDialog(QDialog):
         self.addLayer = QCheckBox(self.tr('Add to an existing layer'))
         self.addLayer.toggled.connect(self.addLayerChecked)
 
-        buttons =   QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, Qt.Horizontal, self)
+        buttons = QDialogButtonBox(
+            QDialogButtonBox.Ok | QDialogButtonBox.Cancel, Qt.Horizontal, self)
         buttons.accepted.connect(self.accept)
         buttons.rejected.connect(self.reject)
 
@@ -77,4 +83,9 @@ class QDrawLayerDialog(QDialog):
     def getName(self, iface, gtype):
         dialog = QDrawLayerDialog(iface, gtype)
         result = dialog.exec_()
-        return (dialog.name.text(), dialog.addLayer.checkState() == Qt.Checked, dialog.layerBox.currentIndex(), dialog.layers, result == QDialog.Accepted)
+        return (
+            dialog.name.text(),
+            dialog.addLayer.checkState() == Qt.Checked,
+            dialog.layerBox.currentIndex(),
+            dialog.layers,
+            result == QDialog.Accepted)
