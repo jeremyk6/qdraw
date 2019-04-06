@@ -17,7 +17,7 @@ repository=https://github.com/jeremyk6/qdraw
 tags=draw, buffer, digitizing
 
 category=Plugins
-icon=icon.PNG
+icon=icon.png
 
 experimental=False
 deprecated=False
