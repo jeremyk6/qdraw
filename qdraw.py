@@ -59,7 +59,7 @@ class Qdraw(object):
                 QCoreApplication.installTranslator(self.translator)
 
         self.iface = iface
-        self.sb = self.iface.mainWindow().statusBar()
+        self.sb = self.iface.statusBarIface()
         self.tool = None
         self.toolname = None
 
