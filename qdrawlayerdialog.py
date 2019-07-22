@@ -38,11 +38,14 @@ class QDrawLayerDialog(QDialog):
         self.layerBox = QComboBox()
         self.layers = []
         for layer in iface.legendInterface().layers():
-            if "memory" in layer.dataProvider().dataSourceUri()[:6]: # must be a memory layer
-                if gtype in layer.dataProvider().dataSourceUri()[:26]: # must be of the same type of the draw
-                    if 'field='+self.tr('Drawings')+':string(255,0)' in layer.dataProvider().dataSourceUri()[-28:]: # must have its first field named Drawings, string type
-                        self.layers.append(layer)
-                        self.layerBox.addItem(layer.name())
+            try:
+                if "memory" in layer.dataProvider().dataSourceUri()[:6]: # must be a memory layer
+                    if gtype in layer.dataProvider().dataSourceUri()[:26]: # must be of the same type of the draw
+                        if 'field='+self.tr('Drawings')+':string(255,0)' in layer.dataProvider().dataSourceUri()[-28:]: # must have its first field named Drawings, string type
+                            self.layers.append(layer)
+                            self.layerBox.addItem(layer.name())
+            except:
+                pass
 
         self.addLayer = QCheckBox(self.tr('Add to an existing layer'))
         self.addLayer.toggled.connect(self.addLayerChecked)
