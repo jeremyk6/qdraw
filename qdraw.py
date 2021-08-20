@@ -22,7 +22,7 @@ from __future__ import absolute_import
 from builtins import str
 from builtins import object
 
-from qgis.PyQt.QtCore import QTranslator, QSettings, QCoreApplication, qVersion
+from qgis.PyQt.QtCore import QTranslator, QSettings, QCoreApplication, QLocale, qVersion
 from qgis.PyQt.QtWidgets import QAction, QMessageBox, QMenu, QInputDialog
 from qgis.PyQt.QtGui import QIcon
 
@@ -44,7 +44,12 @@ from . import resources
 
 class Qdraw(object):
     def __init__(self, iface):
-        locale = QSettings().value('locale/userLocale')[0:2]
+        overrideLocale = QSettings().value("locale/overrideFlag", False, type=bool)
+        if not overrideLocale: locale = QLocale.system().name()
+        else:
+            locale = QSettings().value("locale/userLocale", "")
+            if locale.__class__.__name__=='QVariant': locale= 'en'
+        locale = locale[0:2]
         locale_path = os.path.join(
             os.path.dirname(__file__),
             'i18n',
