@@ -177,17 +177,16 @@ class Qdraw(object):
         )
         bufferMenu = QMenu()
         polygonBufferAction = QAction(
-            QIcon(':/plugins/Qgeric/resources/icon_DrawTP.png'),
-            self.tr('Polygon buffer drawing tool on the selected layer'),
+            QIcon(':/plugins/Qgeric/resources/icon_DrawT.png'),
+            self.tr('Buffer drawing tool on the selected layer'),
             bufferMenu)
-        polygonBufferAction.triggered.connect(self.drawPolygonBuffer)
+        polygonBufferAction.triggered.connect(self.drawBuffer)
         bufferMenu.addAction(polygonBufferAction)
         icon_path = ':/plugins/Qgeric/resources/icon_DrawT.png'
         self.add_action(
             icon_path,
             text=self.tr('Buffer drawing tool on the selected layer'),
             checkable=True,
-            menu=bufferMenu,
             callback=self.drawBuffer,
             parent=self.iface.mainWindow()
         )
@@ -307,13 +306,6 @@ class Qdraw(object):
             self.tr('Buffer drawing tool on the selected layer'))
         self.actions[5].triggered.disconnect()
         self.actions[5].triggered.connect(self.drawBuffer)
-        self.actions[5].menu().actions()[0].setIcon(
-            QIcon(':/plugins/Qgeric/resources/icon_DrawTP.png'))
-        self.actions[5].menu().actions()[0].setText(
-            self.tr('Polygon buffer drawing tool on the selected layer'))
-        self.actions[5].menu().actions()[0].triggered.disconnect()
-        self.actions[5].menu().actions()[0].triggered.connect(
-            self.drawPolygonBuffer)
         self.tool.setAction(self.actions[5])
         self.tool.select.connect(self.selectBuffer)
         self.tool.selectionDone.connect(self.draw)
