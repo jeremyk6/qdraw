@@ -98,7 +98,8 @@ class Qdraw(object):
             status_tip=None,
             whats_this=None,
             menu=None,
-            parent=None):
+            parent=None,
+            object_name=None):
         icon = QIcon(icon_path)
         action = QAction(icon, text, parent)
         action.triggered.connect(callback)
@@ -122,6 +123,9 @@ class Qdraw(object):
                 self.menu,
                 action)
 
+        if object_name is not None:
+            action.setObjectName(object_name)
+
         self.actions.append(action)
 
         return action
@@ -134,6 +138,7 @@ class Qdraw(object):
         pointMenu.addAction(
             QIcon(':/plugins/Qgeric/resources/icon_DrawPtDMS.png'),
             self.tr('DMS Point drawing tool'), self.drawDMSPoint)
+        pointMenu.setObjectName(u'mMenuPointDrawingTool')
         icon_path = ':/plugins/Qgeric/resources/icon_DrawPt.png'
         self.add_action(
             icon_path,
@@ -149,7 +154,8 @@ class Qdraw(object):
             text=self.tr('Line drawing tool'),
             checkable=True,
             callback=self.drawLine,
-            parent=self.iface.mainWindow()
+            parent=self.iface.mainWindow(),
+            object_name='mLineDrawingTool'
         )
         icon_path = ':/plugins/Qgeric/resources/icon_DrawR.png'
         self.add_action(
@@ -157,7 +163,8 @@ class Qdraw(object):
             text=self.tr('Rectangle drawing tool'),
             checkable=True,
             callback=self.drawRect,
-            parent=self.iface.mainWindow()
+            parent=self.iface.mainWindow(),
+            object_name='mRectangleDrawingTool'
         )
         icon_path = ':/plugins/Qgeric/resources/icon_DrawC.png'
         self.add_action(
@@ -165,7 +172,8 @@ class Qdraw(object):
             text=self.tr('Circle drawing tool'),
             checkable=True,
             callback=self.drawCircle,
-            parent=self.iface.mainWindow()
+            parent=self.iface.mainWindow(),
+            object_name='mCircleDrawingTool'
         )
         icon_path = ':/plugins/Qgeric/resources/icon_DrawP.png'
         self.add_action(
@@ -173,7 +181,8 @@ class Qdraw(object):
             text=self.tr('Polygon drawing tool'),
             checkable=True,
             callback=self.drawPolygon,
-            parent=self.iface.mainWindow()
+            parent=self.iface.mainWindow(),
+            object_name='mPolygonDrawingTool'
         )
         bufferMenu = QMenu()
         polygonBufferAction = QAction(
@@ -189,14 +198,16 @@ class Qdraw(object):
             checkable=True,
             menu=bufferMenu,
             callback=self.drawBuffer,
-            parent=self.iface.mainWindow()
+            parent=self.iface.mainWindow(),
+            object_name='mBufferDrawingTool'
         )
         icon_path = ':/plugins/Qgeric/resources/icon_Settings.png'
         self.add_action(
             icon_path,
             text=self.tr('Settings'),
             callback=self.showSettingsWindow,
-            parent=self.iface.mainWindow()
+            parent=self.iface.mainWindow(),
+            object_name='mSettings'
         )
 
     def drawPoint(self):
