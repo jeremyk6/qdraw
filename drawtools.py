@@ -36,6 +36,8 @@ from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence
 from math import sqrt, pi, cos, sin
 
 
+from PyQt5.QtCore import QLocale
+
 class DrawRect(QgsMapTool):
     '''Classe de sélection avec un Rectangle'''
 
@@ -617,6 +619,6 @@ class XYDialog(QDialog):
         X = 0
         Y = 0
         if dialog.X.text().strip() and dialog.Y.text().strip():
-            X = float(dialog.X.text())
-            Y = float(dialog.Y.text())
+            X = QLocale().toDouble(dialog.X.text())[0]
+            Y = QLocale().toDouble(dialog.Y.text())[0]
         return ([QgsPointXY(X, Y), dialog.crs], result == QDialog.Accepted)
