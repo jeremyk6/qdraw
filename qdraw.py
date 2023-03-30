@@ -27,7 +27,7 @@ from qgis.PyQt.QtWidgets import QAction, QMessageBox, QMenu, QInputDialog
 from qgis.PyQt.QtGui import QIcon
 
 from qgis.core import QgsFeature, QgsProject, QgsGeometry,\
-    QgsCoordinateTransform, QgsCoordinateTransformContext, QgsMapLayer,\
+    QgsCoordinateTransform, QgsMapLayer,\
     QgsFeatureRequest, QgsVectorLayer, QgsLayerTreeGroup, QgsRenderContext,\
     QgsCoordinateReferenceSystem, QgsWkbTypes
 from qgis.gui import QgsRubberBand
@@ -389,9 +389,10 @@ then select an entity on the map.'
         self.iface.mapCanvas().mapSettings().destinationCrs().authid()
 
     def geomTransform(self, geom, crs_orig, crs_dest):
+        transform_context = QgsProject.instance().transformContext()
         g = QgsGeometry(geom)
         crsTransform = QgsCoordinateTransform(
-            crs_orig, crs_dest, QgsCoordinateTransformContext())  # which context ?
+            crs_orig, crs_dest, transform_context)
         g.transform(crsTransform)
         return g
 
