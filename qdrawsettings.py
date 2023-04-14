@@ -76,8 +76,11 @@ class QdrawSettings(QWidget):
     def center(self):
         screen = QDesktopWidget().screenGeometry()
         size = self.geometry()
-        self.move(int((screen.width() - size.width()) / 2),
-                  int((screen.height() - size.height()) / 2))
+
+        self.move(
+            int((screen.width() - size.width()) / 2),
+            int((screen.height() - size.height()) / 2)
+        )
 
     def closeEvent(self, e):
         self.clear()
