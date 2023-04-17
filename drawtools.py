@@ -54,7 +54,7 @@ class DrawRect(QgsMapTool):
     def reset(self):
         self.startPoint = self.endPoint = None
         self.isEmittingPoint = False
-        self.rb.reset(True)	 # true, its a polygon
+        self.rb.reset(QgsWkbTypes.PolygonGeometry)
 
     def canvasPressEvent(self, e):
         if not e.button() == Qt.LeftButton:
@@ -107,7 +107,7 @@ class DrawRect(QgsMapTool):
         self.rb.show()
 
     def deactivate(self):
-        self.rb.reset(True)
+        self.rb.reset(QgsWkbTypes.PolygonGeometry)
         QgsMapTool.deactivate(self)
 
 
@@ -199,10 +199,10 @@ class DrawPolygon(QgsMapTool):
 
     def reset(self):
         self.status = 0
-        self.rb.reset(True)
+        self.rb.reset(QgsWkbTypes.PolygonGeometry)
 
     def deactivate(self):
-        self.rb.reset(True)
+        self.rb.reset(QgsWkbTypes.PolygonGeometry)
         QgsMapTool.deactivate(self)
 
 
@@ -262,10 +262,10 @@ class DrawCircle(QgsMapTool):
 
     def reset(self):
         self.status = 0
-        self.rb.reset(True)
+        self.rb.reset(QgsWkbTypes.PolygonGeometry)
 
     def deactivate(self):
-        self.rb.reset(True)
+        self.rb.reset(QgsWkbTypes.PolygonGeometry)
         QgsMapTool.deactivate(self)
 
 
