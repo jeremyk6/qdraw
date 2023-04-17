@@ -45,7 +45,7 @@ class QDrawLayerDialog(QDialog):
             if layer.providerType() == "memory":
                 # ligne suivante à remplacer par if layer.geometryType() == :
                 if gtype in layer.dataProvider().dataSourceUri()[:26]: #  must be of the same type of the draw
-                    if 'field='+self.tr('Drawings')+':string(255,0)' in layer.dataProvider().dataSourceUri()[-28+(len('Drawings')-len(self.tr('Drawings'))):]: # must have its first field named Drawings, string type
+                    if 'field='+self.tr('Drawings')+':string(255,0)' in layer.dataProvider().dataSourceUri(): # must have its first field named Drawings, string type
                         self.layers.append(layer)
                         self.layerBox.addItem(layer.name())
 

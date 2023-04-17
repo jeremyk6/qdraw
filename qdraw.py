@@ -357,15 +357,15 @@ class Qdraw(object):
 
     def resetSB(self):
         message = {
-            'drawPoint': 'Left click to place a point.',
-            'drawLine': 'Left click to place points. Right click to confirm.',
-            'drawRect': 'Maintain the left click to draw a rectangle.',
-            'drawCircle': 'Maintain the left click to draw a circle. \
-Simple Left click to give a perimeter.',
-            'drawPolygon': 'Left click to place points. Right click to \
-confirm.',
-            'drawBuffer': 'Select a vector layer in the Layer Tree, \
-then select an entity on the map.'
+            'drawPoint': self.tr('Left click to place a point.'),
+            'drawLine': self.tr('Left click to place points. Right click to confirm.'),
+            'drawRect': self.tr('Maintain the left click to draw a rectangle.'),
+            'drawCircle': self.tr('Maintain the left click to draw a circle. \
+Simple Left click to give a perimeter.'),
+            'drawPolygon': self.tr('Left click to place points. Right click to \
+confirm.'),
+            'drawBuffer': self.tr('Select a vector layer in the Layer Tree, \
+then select an entity on the map.')
         }
         self.sb.showMessage(self.tr(message[self.toolname]))
 
