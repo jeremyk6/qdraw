@@ -45,7 +45,7 @@ class QDrawLayerDialog(QDialog):
             if layer.providerType() == "memory":
                 # ligne suivante à remplacer par if layer.geometryType() == :
                 if gtype in layer.dataProvider().dataSourceUri()[:26]: #  must be of the same type of the draw
-                    if 'field='+self.tr('Drawings')+':string(255,0)' in layer.dataProvider().dataSourceUri()[-28:]: # must have its first field named Drawings, string type
+                    if 'field='+self.tr('Drawings')+':string(255,0)' in layer.dataProvider().dataSourceUri(): # must have its first field named Drawings, string type
                         self.layers.append(layer)
                         self.layerBox.addItem(layer.name())
 
@@ -71,8 +71,6 @@ class QDrawLayerDialog(QDialog):
         self.layerBox.setEnabled(False)
         self.name.setFocus()
 
-    def tr(self, message):
-        return QCoreApplication.translate('Qdraw', message)
 
     def addLayerChecked(self):
         if self.addLayer.checkState() == Qt.Checked:

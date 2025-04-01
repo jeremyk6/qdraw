@@ -55,8 +55,6 @@ class QdrawSettings(QWidget):
         vbox.addWidget(btn_chColor)
         self.setLayout(vbox)
 
-    def tr(self, message):
-        return QCoreApplication.translate('Qdraw', message)
 
     def handler_opacitySliderValue(self, val):
         self.color.setAlpha(val)
@@ -78,6 +76,7 @@ class QdrawSettings(QWidget):
     def center(self):
         screen = QDesktopWidget().screenGeometry()
         size = self.geometry()
+
         self.move(
             int((screen.width() - size.width()) / 2),
             int((screen.height() - size.height()) / 2)

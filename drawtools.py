@@ -119,7 +119,7 @@ class RectangleDialog(QDialog):
     def __init__(self):
         QDialog.__init__(self)
 
-        self.setWindowTitle(tr('Rectangle size'))
+        self.setWindowTitle(self.tr('Rectangle size'))
 
         self.width = QLineEdit()
         self.height = QLineEdit()
@@ -136,9 +136,9 @@ class RectangleDialog(QDialog):
         buttons.rejected.connect(self.reject)
 
         grid = QGridLayout()
-        grid.addWidget(QLabel(tr('Give a size in m:')), 0, 0)
-        grid.addWidget(QLabel(tr('Width:')), 1, 0)
-        grid.addWidget(QLabel(tr('Height:')), 1, 1)
+        grid.addWidget(QLabel(self.tr('Give a size in m:')), 0, 0)
+        grid.addWidget(QLabel(self.tr('Width:')), 1, 0)
+        grid.addWidget(QLabel(self.tr('Height:')), 1, 1)
         grid.addWidget(self.width, 2, 0)
         grid.addWidget(self.height, 2, 1)
         grid.addWidget(buttons, 3, 0, 1, 2)
@@ -251,8 +251,8 @@ class DrawCircle(QgsMapTool):
             self.selectionDone.emit()
         else:
             radius, ok = QInputDialog.getDouble(
-                self.iface.mainWindow(), tr('Radius'),
-                tr('Give a radius in m:'), min=0)
+                self.iface.mainWindow(), self.tr('Radius'),
+                self.tr('Give a radius in m:'), min=0)
             if radius > 0 and ok:
                 cp = self.toMapCoordinates(e.pos())
                 cp.setX(cp.x() + radius)
@@ -400,15 +400,13 @@ class SelectPoint(QgsMapTool):
         QgsMapTool.deactivate(self)
 
 
-def tr(message):
-    return QCoreApplication.translate('Qdraw', message)
 
 
 class DMSDialog(QDialog):
     def __init__(self):
         QDialog.__init__(self)
 
-        self.setWindowTitle(tr('DMS Point Tool'))
+        self.setWindowTitle(self.tr('DMS Point Tool'))
 
         self.lat_D = QLineEdit()
         self.lat_M = QLineEdit()
@@ -455,35 +453,35 @@ class DMSDialog(QDialog):
         buttons.accepted.connect(self.accept)
         buttons.rejected.connect(self.reject)
 
-        lat_grp = QGroupBox(tr("Latitude"), self)
+        lat_grp = QGroupBox(self.tr("Latitude"), self)
         lat_grp.setStyleSheet(
             "QGroupBox { font-weight: bold; color: #3c3c3c; } ")
         lat_grid = QGridLayout()
-        lat_grid.addWidget(QLabel(tr("Degrees")), 0, 0)
-        lat_grid.addWidget(QLabel(tr("Minutes")), 0, 1)
-        lat_grid.addWidget(QLabel(tr("Seconds")), 0, 2)
-        lat_grid.addWidget(QLabel(tr("Direction")), 0, 3)
+        lat_grid.addWidget(QLabel(self.tr("Degrees")), 0, 0)
+        lat_grid.addWidget(QLabel(self.tr("Minutes")), 0, 1)
+        lat_grid.addWidget(QLabel(self.tr("Seconds")), 0, 2)
+        lat_grid.addWidget(QLabel(self.tr("Direction")), 0, 3)
         lat_grid.addWidget(self.lat_D, 1, 0)
         lat_grid.addWidget(self.lat_M, 1, 1)
         lat_grid.addWidget(self.lat_S, 1, 2)
         lat_grid.addWidget(self.lat_NS, 1, 3)
-        lat_grid.addWidget(QLabel(tr("Decimal minutes")), 2, 1)
+        lat_grid.addWidget(QLabel(self.tr("Decimal minutes")), 2, 1)
         lat_grid.addWidget(self.lat_DM, 3, 1, 1, 2)
         lat_grp.setLayout(lat_grid)
 
-        lon_grp = QGroupBox(tr("Longitude"), self)
+        lon_grp = QGroupBox(self.tr("Longitude"), self)
         lon_grp.setStyleSheet(
             "QGroupBox { font-weight: bold; color: #3c3c3c; } ")
         lon_grid = QGridLayout()
-        lon_grid.addWidget(QLabel(tr("Degrees")), 0, 0)
-        lon_grid.addWidget(QLabel(tr("Minutes")), 0, 1)
-        lon_grid.addWidget(QLabel(tr("Seconds")), 0, 2)
-        lon_grid.addWidget(QLabel(tr("Direction")), 0, 3)
+        lon_grid.addWidget(QLabel(self.tr("Degrees")), 0, 0)
+        lon_grid.addWidget(QLabel(self.tr("Minutes")), 0, 1)
+        lon_grid.addWidget(QLabel(self.tr("Seconds")), 0, 2)
+        lon_grid.addWidget(QLabel(self.tr("Direction")), 0, 3)
         lon_grid.addWidget(self.lon_D, 1, 0)
         lon_grid.addWidget(self.lon_M, 1, 1)
         lon_grid.addWidget(self.lon_S, 1, 2)
         lon_grid.addWidget(self.lon_EW, 1, 3)
-        lon_grid.addWidget(QLabel(tr("Decimal minutes")), 2, 1)
+        lon_grid.addWidget(QLabel(self.tr("Decimal minutes")), 2, 1)
         lon_grid.addWidget(self.lon_DM, 3, 1, 1, 2)
         lon_grp.setLayout(lon_grid)
 
@@ -571,7 +569,7 @@ class XYDialog(QDialog):
     def __init__(self):
         QDialog.__init__(self)
 
-        self.setWindowTitle(tr('XY Point drawing tool'))
+        self.setWindowTitle(self.tr('XY Point drawing tool'))
 
         self.X = QLineEdit()
         self.Y = QLineEdit()
@@ -582,7 +580,7 @@ class XYDialog(QDialog):
         self.X.setValidator(X_val)
         self.Y.setValidator(Y_val)
 
-        self.crsButton = QPushButton("Projection")
+        self.crsButton = QPushButton(self.tr("Projection"))
         self.crsButton.clicked.connect(self.changeCRS)
         self.crsLabel = QLabel("")
 
