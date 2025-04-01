@@ -22,12 +22,13 @@ from qgis.PyQt.QtWidgets import QDialog, QComboBox, QLineEdit, QVBoxLayout, \
     QCheckBox, QDialogButtonBox, QLabel
 from qgis.core import QgsProject
 
+from .utils import tr
 
 class QDrawLayerDialog(QDialog):
     def __init__(self, iface, gtype):
         QDialog.__init__(self)
 
-        self.setWindowTitle(self.tr('Drawing'))
+        self.setWindowTitle(tr('Drawing'))
 
         self.name = QLineEdit()
 
@@ -45,11 +46,11 @@ class QDrawLayerDialog(QDialog):
             if layer.providerType() == "memory":
                 # ligne suivante à remplacer par if layer.geometryType() == :
                 if gtype in layer.dataProvider().dataSourceUri()[:26]: #  must be of the same type of the draw
-                    if 'field='+self.tr('Drawings')+':string(255,0)' in layer.dataProvider().dataSourceUri(): # must have its first field named Drawings, string type
+                    if 'field='+tr('Drawings')+':string(255,0)' in layer.dataProvider().dataSourceUri(): # must have its first field named Drawings, string type
                         self.layers.append(layer)
                         self.layerBox.addItem(layer.name())
 
-        self.addLayer = QCheckBox(self.tr('Add to an existing layer'))
+        self.addLayer = QCheckBox(tr('Add to an existing layer'))
         self.addLayer.toggled.connect(self.addLayerChecked)
 
         buttons = QDialogButtonBox(
@@ -58,7 +59,7 @@ class QDrawLayerDialog(QDialog):
         buttons.rejected.connect(self.reject)
 
         vbox = QVBoxLayout()
-        vbox.addWidget(QLabel(self.tr("Give a name to the feature:")))
+        vbox.addWidget(QLabel(tr("Give a name to the feature:")))
         vbox.addWidget(self.name)
         vbox.addWidget(self.addLayer)
         vbox.addWidget(self.layerBox)
@@ -70,7 +71,6 @@ class QDrawLayerDialog(QDialog):
 
         self.layerBox.setEnabled(False)
         self.name.setFocus()
-
 
     def addLayerChecked(self):
         if self.addLayer.checkState() == Qt.Checked:

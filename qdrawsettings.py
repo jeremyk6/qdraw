@@ -23,6 +23,8 @@ from qgis.PyQt.QtWidgets import QWidget, QPushButton, QSlider, QDesktopWidget,\
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtCore import Qt, QCoreApplication, pyqtSignal
 
+from .utils import tr
+
 
 class QdrawSettings(QWidget):
     """Window used to change settings (transparency/color)"""
@@ -31,7 +33,7 @@ class QdrawSettings(QWidget):
     def __init__(self):
         QWidget.__init__(self)
 
-        self.setWindowTitle(self.tr('Qdraw - Settings'))
+        self.setWindowTitle(tr('Qdraw - Settings'))
         self.setFixedSize(320, 100)
         self.center()
 
@@ -43,10 +45,10 @@ class QdrawSettings(QWidget):
         self.sld_opacity.setValue(255)
         self.sld_opacity.tracking = True
         self.sld_opacity.valueChanged.connect(self.handler_opacitySliderValue)
-        self.lbl_opacity = QLabel(self.tr('Opacity') + ': 100%', self)
+        self.lbl_opacity = QLabel(tr('Opacity') + ': 100%', self)
 
         self.dlg_color = QColorDialog(self)
-        btn_chColor = QPushButton(self.tr('Change the drawing color'), self)
+        btn_chColor = QPushButton(tr('Change the drawing color'), self)
         btn_chColor.clicked.connect(self.handler_chColor)
 
         vbox = QVBoxLayout()
@@ -55,11 +57,10 @@ class QdrawSettings(QWidget):
         vbox.addWidget(btn_chColor)
         self.setLayout(vbox)
 
-
     def handler_opacitySliderValue(self, val):
         self.color.setAlpha(val)
         self.lbl_opacity.setText(
-            self.tr('Opacity')+': '+str(int((float(val) / 255) * 100))+'%')
+            tr('Opacity')+': '+str(int((float(val) / 255) * 100))+'%')
         self.settingsChanged.emit()
 
     def handler_chColor(self):

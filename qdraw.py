@@ -37,6 +37,7 @@ from .drawtools import DrawPoint, DrawRect, DrawLine, DrawCircle, DrawPolygon,\
 from .qdrawsettings import QdrawSettings
 from .qdrawlayerdialog import QDrawLayerDialog
 
+from .utils import tr
 
 import os
 from . import resources
@@ -82,9 +83,6 @@ class Qdraw(object):
             self.iface.removePluginVectorMenu('&Qdraw', action)
             self.iface.removeToolBarIcon(action)
         del self.toolbar
-
-    def tr(self, message):
-        return QCoreApplication.translate('Qdraw', message)
 
     def add_action(
             self,
@@ -134,15 +132,15 @@ class Qdraw(object):
         pointMenu = QMenu()
         pointMenu.addAction(
             QIcon(':/plugins/Qgeric/resources/icon_DrawPtXY.png'),
-            self.tr('XY Point drawing tool'), self.drawXYPoint)
+            tr('XY Point drawing tool'), self.drawXYPoint)
         pointMenu.addAction(
             QIcon(':/plugins/Qgeric/resources/icon_DrawPtDMS.png'),
-            self.tr('DMS Point drawing tool'), self.drawDMSPoint)
+            tr('DMS Point drawing tool'), self.drawDMSPoint)
         pointMenu.setObjectName(u'mMenuPointDrawingTool')
         icon_path = ':/plugins/Qgeric/resources/icon_DrawPt.png'
         self.add_action(
             icon_path,
-            text=self.tr('Point drawing tool'),
+            text=tr('Point drawing tool'),
             checkable=True,
             menu=pointMenu,
             callback=self.drawPoint,
@@ -151,7 +149,7 @@ class Qdraw(object):
         icon_path = ':/plugins/Qgeric/resources/icon_DrawL.png'
         self.add_action(
             icon_path,
-            text=self.tr('Line drawing tool'),
+            text=tr('Line drawing tool'),
             checkable=True,
             callback=self.drawLine,
             parent=self.iface.mainWindow(),
@@ -160,7 +158,7 @@ class Qdraw(object):
         icon_path = ':/plugins/Qgeric/resources/icon_DrawR.png'
         self.add_action(
             icon_path,
-            text=self.tr('Rectangle drawing tool'),
+            text=tr('Rectangle drawing tool'),
             checkable=True,
             callback=self.drawRect,
             parent=self.iface.mainWindow(),
@@ -169,7 +167,7 @@ class Qdraw(object):
         icon_path = ':/plugins/Qgeric/resources/icon_DrawC.png'
         self.add_action(
             icon_path,
-            text=self.tr('Circle drawing tool'),
+            text=tr('Circle drawing tool'),
             checkable=True,
             callback=self.drawCircle,
             parent=self.iface.mainWindow(),
@@ -178,7 +176,7 @@ class Qdraw(object):
         icon_path = ':/plugins/Qgeric/resources/icon_DrawP.png'
         self.add_action(
             icon_path,
-            text=self.tr('Polygon drawing tool'),
+            text=tr('Polygon drawing tool'),
             checkable=True,
             callback=self.drawPolygon,
             parent=self.iface.mainWindow(),
@@ -187,14 +185,14 @@ class Qdraw(object):
         bufferMenu = QMenu()
         polygonBufferAction = QAction(
             QIcon(':/plugins/Qgeric/resources/icon_DrawTP.png'),
-            self.tr('Polygon buffer drawing tool on the selected layer'),
+            tr('Polygon buffer drawing tool on the selected layer'),
             bufferMenu)
         polygonBufferAction.triggered.connect(self.drawPolygonBuffer)
         bufferMenu.addAction(polygonBufferAction)
         icon_path = ':/plugins/Qgeric/resources/icon_DrawT.png'
         self.add_action(
             icon_path,
-            text=self.tr('Buffer drawing tool on the selected layer'),
+            text=tr('Buffer drawing tool on the selected layer'),
             checkable=True,
             menu=bufferMenu,
             callback=self.drawBuffer,
@@ -204,7 +202,7 @@ class Qdraw(object):
         icon_path = ':/plugins/Qgeric/resources/icon_Settings.png'
         self.add_action(
             icon_path,
-            text=self.tr('Settings'),
+            text=tr('Settings'),
             callback=self.showSettingsWindow,
             parent=self.iface.mainWindow(),
             object_name='mSettings'
@@ -230,7 +228,7 @@ class Qdraw(object):
             if point.x() == 0 and point.y() == 0:
                 QMessageBox.critical(
                     self.iface.mainWindow(),
-                    self.tr('Error'), self.tr('Invalid input !'))
+                    tr('Error'), tr('Invalid input !'))
             else:
                 self.drawPoint()
                 self.tool.rb = QgsRubberBand(
@@ -248,7 +246,7 @@ class Qdraw(object):
             if point.x() == 0 and point.y() == 0:
                 QMessageBox.critical(
                     self.iface.mainWindow(),
-                    self.tr('Error'), self.tr('Invalid input !'))
+                    tr('Error'), tr('Invalid input !'))
             else:
                 self.drawPoint()
                 self.tool.rb = QgsRubberBand(
@@ -315,13 +313,13 @@ class Qdraw(object):
         self.actions[5].setIcon(
             QIcon(':/plugins/Qgeric/resources/icon_DrawT.png'))
         self.actions[5].setText(
-            self.tr('Buffer drawing tool on the selected layer'))
+            tr('Buffer drawing tool on the selected layer'))
         self.actions[5].triggered.disconnect()
         self.actions[5].triggered.connect(self.drawBuffer)
         self.actions[5].menu().actions()[0].setIcon(
             QIcon(':/plugins/Qgeric/resources/icon_DrawTP.png'))
         self.actions[5].menu().actions()[0].setText(
-            self.tr('Polygon buffer drawing tool on the selected layer'))
+            tr('Polygon buffer drawing tool on the selected layer'))
         self.actions[5].menu().actions()[0].triggered.disconnect()
         self.actions[5].menu().actions()[0].triggered.connect(
             self.drawPolygonBuffer)
@@ -341,13 +339,13 @@ class Qdraw(object):
         self.actions[5].setIcon(
             QIcon(':/plugins/Qgeric/resources/icon_DrawTP.png'))
         self.actions[5].setText(
-            self.tr('Polygon buffer drawing tool on the selected layer'))
+            tr('Polygon buffer drawing tool on the selected layer'))
         self.actions[5].triggered.disconnect()
         self.actions[5].triggered.connect(self.drawPolygonBuffer)
         self.actions[5].menu().actions()[0].setIcon(
             QIcon(':/plugins/Qgeric/resources/icon_DrawT.png'))
         self.actions[5].menu().actions()[0].setText(
-            self.tr('Buffer drawing tool on the selected layer'))
+            tr('Buffer drawing tool on the selected layer'))
         self.actions[5].menu().actions()[0].triggered.disconnect()
         self.actions[5].menu().actions()[0].triggered.connect(self.drawBuffer)
         self.tool.setAction(self.actions[5])
@@ -368,17 +366,17 @@ class Qdraw(object):
 
     def resetSB(self):
         message = {
-            'drawPoint': self.tr('Left click to place a point.'),
-            'drawLine': self.tr('Left click to place points. Right click to confirm.'),
-            'drawRect': self.tr('Maintain the left click to draw a rectangle.'),
-            'drawCircle': self.tr('Maintain the left click to draw a circle. \
+            'drawPoint': tr('Left click to place a point.'),
+            'drawLine': tr('Left click to place points. Right click to confirm.'),
+            'drawRect': tr('Maintain the left click to draw a rectangle.'),
+            'drawCircle': tr('Maintain the left click to draw a circle. \
 Simple Left click to give a perimeter.'),
-            'drawPolygon': self.tr('Left click to place points. Right click to \
+            'drawPolygon': tr('Left click to place points. Right click to \
 confirm.'),
-            'drawBuffer': self.tr('Select a vector layer in the Layer Tree, \
+            'drawBuffer': tr('Select a vector layer in the Layer Tree, \
 then select an entity on the map.')
         }
-        self.sb.showMessage(self.tr(message[self.toolname]))
+        self.sb.showMessage(tr(message[self.toolname]))
 
     def updateSB(self):
         g = self.geomTransform(
@@ -388,15 +386,15 @@ then select an entity on the map.')
         if self.toolname == 'drawLine':
             if g.length() >= 0:
                 self.sb.showMessage(
-                    self.tr('Length') + ': ' + str("%.2f" % g.length()) + " m")
+                    tr('Length') + ': ' + str("%.2f" % g.length()) + " m")
             else:
-                self.sb.showMessage(self.tr('Length')+': '+"0 m")
+                self.sb.showMessage(tr('Length')+': '+"0 m")
         else:
             if g.area() >= 0:
                 self.sb.showMessage(
-                    self.tr('Area')+': '+str("%.2f" % g.area())+" m"+u'²')
+                    tr('Area')+': '+str("%.2f" % g.area())+" m"+u'²')
             else:
-                self.sb.showMessage(self.tr('Area')+': '+"0 m"+u'²')
+                self.sb.showMessage(tr('Area')+': '+"0 m"+u'²')
         self.iface.mapCanvas().mapSettings().destinationCrs().authid()
 
     def geomTransform(self, geom, crs_orig, crs_dest):
@@ -460,9 +458,9 @@ then select an entity on the map.')
                 errBuffer_noAtt = True
             else:
                 perim, ok = QInputDialog.getDouble(
-                    self.iface.mainWindow(), self.tr('Perimeter'),
-                    self.tr('Give a perimeter in m:')
-                    + '\n'+self.tr('(works only with metric crs)'),
+                    self.iface.mainWindow(), tr('Perimeter'),
+                    tr('Give a perimeter in m:')
+                    + '\n'+tr('(works only with metric crs)'),
                     min=0)
                 g = self.bGeom.buffer(perim, 40)
                 rb.setToGeometry(g, QgsVectorLayer(
@@ -494,17 +492,17 @@ then select an entity on the map.')
                     g = g.centroid()
             else:
                 if self.drawShape == 'point':
-                    layer = QgsVectorLayer("Point?crs="+self.iface.mapCanvas().mapSettings().destinationCrs().authid()+"&field="+self.tr('Drawings')+":string(255)", name, "memory")
+                    layer = QgsVectorLayer("Point?crs="+self.iface.mapCanvas().mapSettings().destinationCrs().authid()+"&field="+tr('Drawings')+":string(255)", name, "memory")
                     g = g.centroid()  # force geometry as point
                 elif self.drawShape == 'XYpoint':
-                    layer = QgsVectorLayer("Point?crs="+self.XYcrs.authid()+"&field="+self.tr('Drawings')+":string(255)", name, "memory")
+                    layer = QgsVectorLayer("Point?crs="+self.XYcrs.authid()+"&field="+tr('Drawings')+":string(255)", name, "memory")
                     g = g.centroid()
                 elif self.drawShape == 'line':
-                    layer = QgsVectorLayer("LineString?crs="+self.iface.mapCanvas().mapSettings().destinationCrs().authid()+"&field="+self.tr('Drawings')+":string(255)", name, "memory")
+                    layer = QgsVectorLayer("LineString?crs="+self.iface.mapCanvas().mapSettings().destinationCrs().authid()+"&field="+tr('Drawings')+":string(255)", name, "memory")
                     # fix_print_with_import
-                    print("LineString?crs="+self.iface.mapCanvas().mapSettings().destinationCrs().authid()+"&field="+self.tr('Drawings')+":string(255)")
+                    print("LineString?crs="+self.iface.mapCanvas().mapSettings().destinationCrs().authid()+"&field="+tr('Drawings')+":string(255)")
                 else:
-                    layer = QgsVectorLayer("Polygon?crs="+self.iface.mapCanvas().mapSettings().destinationCrs().authid()+"&field="+self.tr('Drawings')+":string(255)", name, "memory")
+                    layer = QgsVectorLayer("Polygon?crs="+self.iface.mapCanvas().mapSettings().destinationCrs().authid()+"&field="+tr('Drawings')+":string(255)", name, "memory")
             layer.startEditing()
             symbols = layer.renderer().symbols(QgsRenderContext())  # todo which context ?
             symbols[0].setColor(self.settings.getColor())
@@ -516,11 +514,11 @@ then select an entity on the map.')
             if not add:
                 pjt = QgsProject.instance()
                 pjt.addMapLayer(layer, False)
-                if pjt.layerTreeRoot().findGroup(self.tr('Drawings')) is None:
+                if pjt.layerTreeRoot().findGroup(tr('Drawings')) is None:
                     pjt.layerTreeRoot().insertChildNode(
-                        0, QgsLayerTreeGroup(self.tr('Drawings')))
+                        0, QgsLayerTreeGroup(tr('Drawings')))
                 group = pjt.layerTreeRoot().findGroup(
-                    self.tr('Drawings'))
+                    tr('Drawings'))
                 group.insertLayer(0, layer)
             self.iface.layerTreeView().refreshLayerSymbology(layer.id())
             self.iface.mapCanvas().refresh()
@@ -528,17 +526,17 @@ then select an entity on the map.')
             if warning:
                 if errBuffer_noAtt:
                     self.iface.messageBar().pushWarning(
-                        self.tr('Warning'),
-                        self.tr('You didn\'t click on a layer\'s attribute !'))
+                        tr('Warning'),
+                        tr('You didn\'t click on a layer\'s attribute !'))
                 elif errBuffer_Vertices:
                     self.iface.messageBar().pushWarning(
-                        self.tr('Warning'),
-                        self.tr('You must give a non-null value for a \
+                        tr('Warning'),
+                        tr('You must give a non-null value for a \
 point\'s or line\'s perimeter !'))
                 else:
                     self.iface.messageBar().pushWarning(
-                        self.tr('Warning'),
-                        self.tr('There is no selected layer, or it is not \
+                        tr('Warning'),
+                        tr('There is no selected layer, or it is not \
 vector nor visible !'))
         self.tool.reset()
         self.resetSB()
