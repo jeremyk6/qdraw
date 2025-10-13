@@ -35,7 +35,7 @@ from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence
 
 from math import sqrt, pi, cos, sin
 
-from PyQt5.QtCore import QLocale
+from qgis.PyQt.QtCore import QLocale
 
 from .utils import tr
 
@@ -49,7 +49,7 @@ class DrawRect(QgsMapTool):
         self.canvas = iface.mapCanvas()
         QgsMapToolEmitPoint.__init__(self, self.canvas)
         self.iface = iface
-        self.rb = QgsRubberBand(self.canvas, QgsWkbTypes.PolygonGeometry)
+        self.rb = QgsRubberBand(self.canvas, QgsWkbTypes.GeometryType.PolygonGeometry)
         self.rb.setColor(couleur)
         self.reset()
         return None
@@ -57,10 +57,10 @@ class DrawRect(QgsMapTool):
     def reset(self):
         self.startPoint = self.endPoint = None
         self.isEmittingPoint = False
-        self.rb.reset(QgsWkbTypes.PolygonGeometry)
+        self.rb.reset(QgsWkbTypes.GeometryType.PolygonGeometry)
 
     def canvasPressEvent(self, e):
-        if not e.button() == Qt.LeftButton:
+        if not e.button() == Qt.MouseButton.LeftButton:
             return
         self.startPoint = self.toMapCoordinates(e.pos())
         self.endPoint = self.startPoint
@@ -68,7 +68,7 @@ class DrawRect(QgsMapTool):
 
     def canvasReleaseEvent(self, e):
         self.isEmittingPoint = False
-        if not e.button() == Qt.LeftButton:
+        if not e.button() == Qt.MouseButton.LeftButton:
             return None
         if self.rb.numberOfVertices() > 3:
             self.selectionDone.emit()
@@ -94,7 +94,7 @@ class DrawRect(QgsMapTool):
         self.showRect(self.startPoint, self.endPoint)
 
     def showRect(self, startPoint, endPoint):
-        self.rb.reset(QgsWkbTypes.PolygonGeometry)  # true, it's a polygon
+        self.rb.reset(QgsWkbTypes.GeometryType.PolygonGeometry)  # true, it's a polygon
         if startPoint.x() == endPoint.x() or startPoint.y() == endPoint.y():
             return
 
@@ -110,7 +110,7 @@ class DrawRect(QgsMapTool):
         self.rb.show()
 
     def deactivate(self):
-        self.rb.reset(QgsWkbTypes.PolygonGeometry)
+        self.rb.reset(QgsWkbTypes.GeometryType.PolygonGeometry)
         QgsMapTool.deactivate(self)
 
 
@@ -132,7 +132,7 @@ class RectangleDialog(QDialog):
         self.height.setValidator(height_val)
 
         buttons = QDialogButtonBox(
-            QDialogButtonBox.Ok | QDialogButtonBox.Cancel, Qt.Horizontal, self)
+            QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel, Qt.Orientation.Horizontal, self)
         buttons.accepted.connect(self.accept)
         buttons.rejected.connect(self.reject)
 
@@ -148,14 +148,14 @@ class RectangleDialog(QDialog):
 
     def getSize(self):
         dialog = RectangleDialog()
-        result = dialog.exec_()
+        result = dialog.exec()
 
         width = 0
         height = 0
         if dialog.width.text().strip() and dialog.height.text().strip():
             width = float(dialog.width.text())
             height = float(dialog.height.text())
-        return (width, height, result == QDialog.Accepted)
+        return (width, height, result == QDialog.DialogCode.Accepted)
 
 
 class DrawPolygon(QgsMapTool):
@@ -170,19 +170,19 @@ class DrawPolygon(QgsMapTool):
         self.canvas = canvas
         self.iface = iface
         self.status = 0
-        self.rb = QgsRubberBand(self.canvas, QgsWkbTypes.PolygonGeometry)
+        self.rb = QgsRubberBand(self.canvas, QgsWkbTypes.GeometryType.PolygonGeometry)
         self.rb.setColor(couleur)
         return None
 
     def keyPressEvent(self, e):
-        if e.matches(QKeySequence.Undo):
+        if e.matches(QKeySequence.StandardKey.Undo):
             if self.rb.numberOfVertices() > 1:
                 self.rb.removeLastPoint()
 
     def canvasPressEvent(self, e):
-        if e.button() == Qt.LeftButton:
+        if e.button() == Qt.MouseButton.LeftButton:
             if self.status == 0:
-                self.rb.reset(QgsWkbTypes.PolygonGeometry)
+                self.rb.reset(QgsWkbTypes.GeometryType.PolygonGeometry)
                 self.status = 1
             self.rb.addPoint(self.toMapCoordinates(e.pos()))
         else:
@@ -202,10 +202,10 @@ class DrawPolygon(QgsMapTool):
 
     def reset(self):
         self.status = 0
-        self.rb.reset(QgsWkbTypes.PolygonGeometry)
+        self.rb.reset(QgsWkbTypes.GeometryType.PolygonGeometry)
 
     def deactivate(self):
-        self.rb.reset(QgsWkbTypes.PolygonGeometry)
+        self.rb.reset(QgsWkbTypes.GeometryType.PolygonGeometry)
         QgsMapTool.deactivate(self)
 
 
@@ -222,12 +222,12 @@ class DrawCircle(QgsMapTool):
         self.iface = iface
         self.status = 0
         self.segments = segments
-        self.rb = QgsRubberBand(self.canvas, QgsWkbTypes.PolygonGeometry)
+        self.rb = QgsRubberBand(self.canvas, QgsWkbTypes.GeometryType.PolygonGeometry)
         self.rb.setColor(color)
         return None
 
     def canvasPressEvent(self, e):
-        if not e.button() == Qt.LeftButton:
+        if not e.button() == Qt.MouseButton.LeftButton:
             return
         self.status = 1
         self.center = self.toMapCoordinates(e.pos())
@@ -245,7 +245,7 @@ class DrawCircle(QgsMapTool):
 
     def canvasReleaseEvent(self, e):
         '''La sélection est faîte'''
-        if not e.button() == Qt.LeftButton:
+        if not e.button() == Qt.MouseButton.LeftButton:
             return None
         self.status = 0
         if self.rb.numberOfVertices() > 3:
@@ -265,17 +265,17 @@ class DrawCircle(QgsMapTool):
 
     def reset(self):
         self.status = 0
-        self.rb.reset(QgsWkbTypes.PolygonGeometry)
+        self.rb.reset(QgsWkbTypes.GeometryType.PolygonGeometry)
 
     def deactivate(self):
-        self.rb.reset(QgsWkbTypes.PolygonGeometry)
+        self.rb.reset(QgsWkbTypes.GeometryType.PolygonGeometry)
         QgsMapTool.deactivate(self)
 
 
 def rbcircle(rb, center, edgePoint, N):
     '''Fonction qui affiche une rubberband sous forme de cercle'''
     r = sqrt(center.sqrDist(edgePoint))
-    rb.reset(QgsWkbTypes.PolygonGeometry)
+    rb.reset(QgsWkbTypes.GeometryType.PolygonGeometry)
     for itheta in range(N + 1):
         theta = itheta * (2.0 * pi / N)
         rb.addPoint(QgsPointXY(center.x() + r * cos(theta),
@@ -293,19 +293,19 @@ class DrawLine(QgsMapTool):
         self.canvas = canvas
         self.iface = iface
         self.status = 0
-        self.rb = QgsRubberBand(self.canvas, QgsWkbTypes.LineGeometry)
+        self.rb = QgsRubberBand(self.canvas, QgsWkbTypes.GeometryType.LineGeometry)
         self.rb.setColor(couleur)
         return None
 
     def keyPressEvent(self, e):
-        if e.matches(QKeySequence.Undo):
+        if e.matches(QKeySequence.StandardKey.Undo):
             if self.rb.numberOfVertices() > 1:
                 self.rb.removeLastPoint()
 
     def canvasPressEvent(self, e):
-        if e.button() == Qt.LeftButton:
+        if e.button() == Qt.MouseButton.LeftButton:
             if self.status == 0:
-                self.rb.reset(QgsWkbTypes.LineGeometry)
+                self.rb.reset(QgsWkbTypes.GeometryType.LineGeometry)
                 self.status = 1
             self.rb.addPoint(self.toMapCoordinates(e.pos()))
         else:
@@ -325,10 +325,10 @@ class DrawLine(QgsMapTool):
 
     def reset(self):
         self.status = 0
-        self.rb.reset(QgsWkbTypes.LineGeometry)
+        self.rb.reset(QgsWkbTypes.GeometryType.LineGeometry)
 
     def deactivate(self):
-        self.rb.reset(QgsWkbTypes.LineGeometry)
+        self.rb.reset(QgsWkbTypes.GeometryType.LineGeometry)
         QgsMapTool.deactivate(self)
 
 
@@ -340,20 +340,20 @@ class DrawPoint(QgsMapTool):
         QgsMapTool.__init__(self, canvas)
         self.canvas = canvas
         self.iface = iface
-        self.rb = QgsRubberBand(self.canvas, QgsWkbTypes.PointGeometry)
+        self.rb = QgsRubberBand(self.canvas, QgsWkbTypes.GeometryType.PointGeometry)
         self.rb.setColor(couleur)
         self.rb.setWidth(3)
 
     def canvasReleaseEvent(self, e):
-        if e.button() == Qt.LeftButton:
+        if e.button() == Qt.MouseButton.LeftButton:
             self.rb.addPoint(self.toMapCoordinates(e.pos()))
             self.selectionDone.emit()
 
     def reset(self):
-        self.rb.reset(QgsWkbTypes.PointGeometry)
+        self.rb.reset(QgsWkbTypes.GeometryType.PointGeometry)
 
     def deactivate(self):
-        self.rb.reset(QgsWkbTypes.PointGeometry)
+        self.rb.reset(QgsWkbTypes.GeometryType.PointGeometry)
         QgsMapTool.deactivate(self)
 
 
@@ -366,14 +366,14 @@ class SelectPoint(QgsMapTool):
         QgsMapTool.__init__(self, canvas)
         self.canvas = canvas
         self.iface = iface
-        self.rb = QgsRubberBand(self.canvas, QgsWkbTypes.PolygonGeometry)
+        self.rb = QgsRubberBand(self.canvas, QgsWkbTypes.GeometryType.PolygonGeometry)
         self.rb.setColor(couleur)
-        self.rbSelect = QgsRubberBand(self.canvas, QgsWkbTypes.PolygonGeometry)
+        self.rbSelect = QgsRubberBand(self.canvas, QgsWkbTypes.GeometryType.PolygonGeometry)
         return None
 
     def canvasReleaseEvent(self, e):
-        if e.button() == Qt.LeftButton:
-            self.rbSelect.reset(QgsWkbTypes.PolygonGeometry)
+        if e.button() == Qt.MouseButton.LeftButton:
+            self.rbSelect.reset(QgsWkbTypes.GeometryType.PolygonGeometry)
             cp = self.toMapCoordinates(
                 QPoint(e.pos().x() - 5, e.pos().y() - 5))
             self.rbSelect.addPoint(cp)
@@ -392,12 +392,12 @@ class SelectPoint(QgsMapTool):
         return None
 
     def reset(self):
-        self.rb.reset(QgsWkbTypes.PolygonGeometry)
-        self.rbSelect.reset(QgsWkbTypes.PolygonGeometry)
+        self.rb.reset(QgsWkbTypes.GeometryType.PolygonGeometry)
+        self.rbSelect.reset(QgsWkbTypes.GeometryType.PolygonGeometry)
 
     def deactivate(self):
-        self.rb.reset(QgsWkbTypes.PolygonGeometry)
-        self.rbSelect.reset(QgsWkbTypes.PolygonGeometry)
+        self.rb.reset(QgsWkbTypes.GeometryType.PolygonGeometry)
+        self.rbSelect.reset(QgsWkbTypes.GeometryType.PolygonGeometry)
         QgsMapTool.deactivate(self)
 
 class DMSDialog(QDialog):
@@ -447,7 +447,7 @@ class DMSDialog(QDialog):
         self.lon_EW.addItem("W")
 
         buttons = QDialogButtonBox(
-            QDialogButtonBox.Ok | QDialogButtonBox.Cancel, Qt.Horizontal, self)
+            QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel, Qt.Orientation.Horizontal, self)
         buttons.accepted.connect(self.accept)
         buttons.rejected.connect(self.reject)
 
@@ -492,7 +492,7 @@ class DMSDialog(QDialog):
 
     def getPoint(self):
         dialog = DMSDialog()
-        result = dialog.exec_()
+        result = dialog.exec()
 
         latitude = 0
         longitude = 0
@@ -512,7 +512,7 @@ class DMSDialog(QDialog):
                 + float(dialog.lon_S.text()) / 3600
             if dialog.lon_EW.currentIndex() == 1:
                 longitude *= -1
-        return (QgsPointXY(longitude, latitude), result == QDialog.Accepted)
+        return (QgsPointXY(longitude, latitude), result == QDialog.DialogCode.Accepted)
 
     def lat_MS_edited(self):
         if self.lat_M.text().strip():
@@ -583,7 +583,7 @@ class XYDialog(QDialog):
         self.crsLabel = QLabel("")
 
         buttons = QDialogButtonBox(
-            QDialogButtonBox.Ok | QDialogButtonBox.Cancel, Qt.Horizontal, self)
+            QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel, Qt.Orientation.Horizontal, self)
         buttons.accepted.connect(self.accept)
         buttons.rejected.connect(self.reject)
 
@@ -600,7 +600,7 @@ class XYDialog(QDialog):
 
     def changeCRS(self):
         projSelector = QgsProjectionSelectionDialog()
-        projSelector.exec_()
+        projSelector.exec()
         self.crs = projSelector.crs()
         self.crsLabel.setText(self.crs.authid())
 
@@ -610,11 +610,11 @@ class XYDialog(QDialog):
         dialog = XYDialog()
         dialog.crs = crs
         dialog.crsLabel.setText(crs.authid())
-        result = dialog.exec_()
+        result = dialog.exec()
 
         X = 0
         Y = 0
         if dialog.X.text().strip() and dialog.Y.text().strip():
             X = QLocale().toDouble(dialog.X.text())[0]
             Y = QLocale().toDouble(dialog.Y.text())[0]
-        return ([QgsPointXY(X, Y), dialog.crs], result == QDialog.Accepted)
+        return ([QgsPointXY(X, Y), dialog.crs], result == QDialog.DialogCode.Accepted)

@@ -232,7 +232,7 @@ class Qdraw(object):
             else:
                 self.drawPoint()
                 self.tool.rb = QgsRubberBand(
-                    self.iface.mapCanvas(), QgsWkbTypes.PointGeometry)
+                    self.iface.mapCanvas(), QgsWkbTypes.GeometryType.PointGeometry)
                 self.tool.rb.setColor(self.settings.getColor())
                 self.tool.rb.setWidth(3)
                 self.tool.rb.addPoint(point)
@@ -250,7 +250,7 @@ class Qdraw(object):
             else:
                 self.drawPoint()
                 self.tool.rb = QgsRubberBand(
-                    self.iface.mapCanvas(), QgsWkbTypes.PointGeometry)
+                    self.iface.mapCanvas(), QgsWkbTypes.GeometryType.PointGeometry)
                 self.tool.rb.setColor(self.settings.getColor())
                 self.tool.rb.setWidth(3)
                 self.tool.rb.addPoint(point)
@@ -412,7 +412,7 @@ then select an entity on the map.')
         else:
             rbSelect = self.tool.rbSelect
         layer = self.iface.layerTreeView().currentLayer()
-        if layer is not None and layer.type() == QgsMapLayer.VectorLayer \
+        if layer is not None and layer.type() == QgsMapLayer.LayerType.VectorLayer \
                 and self.iface.layerTreeView().currentNode().isVisible():
             # rubberband reprojection
             g = self.geomTransform(

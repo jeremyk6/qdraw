@@ -54,7 +54,7 @@ class QDrawLayerDialog(QDialog):
         self.addLayer.toggled.connect(self.addLayerChecked)
 
         buttons = QDialogButtonBox(
-            QDialogButtonBox.Ok | QDialogButtonBox.Cancel, Qt.Horizontal, self)
+            QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel, Qt.Orientation.Horizontal, self)
         buttons.accepted.connect(self.accept)
         buttons.rejected.connect(self.reject)
 
@@ -73,17 +73,17 @@ class QDrawLayerDialog(QDialog):
         self.name.setFocus()
 
     def addLayerChecked(self):
-        if self.addLayer.checkState() == Qt.Checked:
+        if self.addLayer.checkState() == Qt.CheckState.Checked:
             self.layerBox.setEnabled(True)
         else:
             self.layerBox.setEnabled(False)
 
     def getName(self, iface, gtype):
         dialog = QDrawLayerDialog(iface, gtype)
-        result = dialog.exec_()
+        result = dialog.exec()
         return (
             dialog.name.text(),
-            dialog.addLayer.checkState() == Qt.Checked,
+            dialog.addLayer.checkState() == Qt.CheckState.Checked,
             dialog.layerBox.currentIndex(),
             dialog.layers,
-            result == QDialog.Accepted)
+            result == QDialog.DialogCode.Accepted)

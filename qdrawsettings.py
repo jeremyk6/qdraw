@@ -18,8 +18,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from builtins import str
-from qgis.PyQt.QtWidgets import QWidget, QPushButton, QSlider, QDesktopWidget,\
-    QLabel, QColorDialog, QVBoxLayout
+from qgis.PyQt.QtWidgets import QWidget, QPushButton, QSlider,\
+    QLabel, QColorDialog, QVBoxLayout, QApplication
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtCore import Qt, QCoreApplication, pyqtSignal
 
@@ -40,7 +40,7 @@ class QdrawSettings(QWidget):
         # default color
         self.color = QColor(60, 151, 255, 255)
 
-        self.sld_opacity = QSlider(Qt.Horizontal, self)
+        self.sld_opacity = QSlider(Qt.Orientation.Horizontal, self)
         self.sld_opacity.setRange(0, 255)
         self.sld_opacity.setValue(255)
         self.sld_opacity.tracking = True
@@ -75,7 +75,7 @@ class QdrawSettings(QWidget):
         return self.color
 
     def center(self):
-        screen = QDesktopWidget().screenGeometry()
+        screen = QApplication.primaryScreen().geometry()
         size = self.geometry()
 
         self.move(
