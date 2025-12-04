@@ -241,7 +241,7 @@ class Qdraw(object):
 
     def drawDMSPoint(self):
         point, ok = DMSDialog().getPoint()
-        self.XYcrs = QgsCoordinateReferenceSystem(4326)
+        self.XYcrs = QgsCoordinateReferenceSystem.fromEpsgId(4236)
         if ok:
             if point.x() == 0 and point.y() == 0:
                 QMessageBox.critical(
@@ -382,7 +382,7 @@ then select an entity on the map.')
         g = self.geomTransform(
             self.tool.rb.asGeometry(),
             self.iface.mapCanvas().mapSettings().destinationCrs(),
-            QgsCoordinateReferenceSystem(2154))
+            QgsCoordinateReferenceSystem.fromEpsgId(2154))
         if self.toolname == 'drawLine':
             if g.length() >= 0:
                 self.sb.showMessage(
