@@ -129,7 +129,7 @@ class Qdraw(object):
         return action
 
     def initGui(self):
-        pointMenu = QMenu()
+        pointMenu = QMenu(self.toolbar)
         pointMenu.addAction(
             QIcon(':/plugins/Qgeric/resources/icon_DrawPtXY.png'),
             tr('XY Point drawing tool'), self.drawXYPoint)
@@ -182,7 +182,7 @@ class Qdraw(object):
             parent=self.iface.mainWindow(),
             object_name='mPolygonDrawingTool'
         )
-        bufferMenu = QMenu()
+        bufferMenu = QMenu(self.toolbar)
         polygonBufferAction = QAction(
             QIcon(':/plugins/Qgeric/resources/icon_DrawTP.png'),
             tr('Polygon buffer drawing tool on the selected layer'),
