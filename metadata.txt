@@ -7,6 +7,7 @@ description[de]=Einfache Formen leicht zeichnen
 version=3.1
 author=Jérémy Kalsron
 email=jeremy.kalsron@gmail.com
+supportsQt6=True
 
 about=Plugin that enables drawing simple shapes without the need to manually create a layer. A new memory layer containing the drawing will be automatically created in a "Drawings" group. This plugin enables drawing points (also with coordinates), lines, rectangles, circles, polygons, and buffers of existing features.
 about[fr]=Ce plugin permet de dessiner des formes simples en éliminant la nécessité de créer manuellement une nouvelle couche. Une nouvelle couche mémoire contenant le dessin sera automatiquement créée dans un groupe "Dessins". Ce plugin permet de dessiner des points (éventuellement en précisant des coordonnées), des lignes, des cercles, des polygones, et des tampons basés sur des entités existantes.
